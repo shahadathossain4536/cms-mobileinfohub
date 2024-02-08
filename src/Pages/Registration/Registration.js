@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { useDispatch, useSelector } from 'react-redux';
 import Select from 'react-select';
+import { signup } from '../../redux/actions/user.actions';
 const Registration = () => {
     const [selectedOption, setSelectedOption] = useState(null);
   const [isClearable, setIsClearable] = useState(true);
@@ -8,7 +10,10 @@ const Registration = () => {
   const [isDisabled, setIsDisabled] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isRtl, setIsRtl] = useState(false);
-  console.log("object", selectedOption);
+  // console.log("object", selectedOption);
+  const dispatch = useDispatch();
+  const auth = useSelector((state) => state.auth);
+  const user = useSelector((state) => state.user);
   const options = [
     { value: 'admin', label: 'Admin' },
     { value: 'moderator', label: 'Moderator' },
@@ -25,8 +30,15 @@ const Registration = () => {
   const onSubmit = async (data) => {
 
     // reset();
+  // dispatch(signup(user));
 
+    // const user = {
+    //   role : selectedOption?.value,
+    //   ...data
+    // }
     console.log(data);
+
+    dispatch(signup(data));
   };
 
 
@@ -49,7 +61,7 @@ const Registration = () => {
 
 
           />
-          {
+          {/* {
             selectedOption?.value && 'shopkeeper' && <div className='max-w-[600px] w-full'>
             <input className='max-w-[600px] w-full h-14 border-2 border-gray-500 rounded-lg block outline-none px-4 text-xl my-4' type="text" placeholder='Shop Name'
               {...register("shopName", {
@@ -73,29 +85,44 @@ const Registration = () => {
               )}
             </label>
           </div>
-        }
+        } */}
 
           <div className='max-w-[600px] w-full'>
-            <input className='max-w-[600px] w-full h-14 border-2 border-gray-500 rounded-lg block outline-none px-4 text-xl my-4' type="text" placeholder='Name'
-              {...register("name", {
+            <input className='max-w-[600px] w-full h-14 border-2 border-gray-500 rounded-lg block outline-none px-4 text-xl my-4' type="text" placeholder='FirstName'
+              {...register("firstName", {
                 required: {
                   value: true,
-                  message: "Enter Your Name",
+                  message: "Enter Your firstName",
                 },
 
               })}
             />
             <label class="label">
-              {errors.email?.type === "required" && (
+              {errors.firstName?.type === "required" && (
                 <span class="label-text-alt text-red-600">
-                  {errors?.email?.message}
+                  {errors?.firstName?.message}
                 </span>
               )}
-              {errors.email?.type === "pattern" && (
+
+            </label>
+          </div>
+          <div className='max-w-[600px] w-full'>
+            <input className='max-w-[600px] w-full h-14 border-2 border-gray-500 rounded-lg block outline-none px-4 text-xl my-4' type="text" placeholder='LastName'
+              {...register("lastName", {
+                required: {
+                  value: true,
+                  message: "Enter Your lastName",
+                },
+
+              })}
+            />
+            <label class="label">
+              {errors.lastName?.type === "required" && (
                 <span class="label-text-alt text-red-600">
-                  {errors?.email?.message}
+                  {errors?.lastName?.message}
                 </span>
               )}
+
             </label>
           </div>
           <div className='max-w-[600px] w-full'>

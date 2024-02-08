@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { Link } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { Link, useNavigate } from 'react-router-dom';
 import Select from 'react-select';
+import { login } from '../../redux/actions/auth.actions';
 const Login = () => {
   const [selectedOption, setSelectedOption] = useState(null);
   const [isClearable, setIsClearable] = useState(true);
@@ -22,12 +24,23 @@ const Login = () => {
     handleSubmit,
     reset,
   } = useForm();
-
+  const dispatch = useDispatch();
+  const auth = useSelector((state) => state.auth);
+  const navigate = useNavigate()
+  if (auth.authenticate) {
+    navigate('/dashboard');
+  }
+  console.log("authauthauth",auth);
   const onSubmit = async (data) => {
 
     // reset();
-
+    // const user = {
+    //   role: selectedOption?.value,
+    //   ...data
+    // }
     console.log(data);
+
+    dispatch(login(data));
   };
   return (
     <div className='flex justify-center items-center  h-[600px]'>
@@ -82,12 +95,12 @@ const Login = () => {
                   value: true,
                   message: "Enter Your Password",
                 },
-                pattern: {
-                  value:
-                    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
-                  message:
-                    "Minimum 8 characters, at least 1 uppercase letter, 1 lowercase letter, 1 number and 1 special character",
-                },
+                // pattern: {
+                //   value:
+                //     /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
+                //   message:
+                //     "Minimum 8 characters, at least 1 uppercase letter, 1 lowercase letter, 1 number and 1 special character",
+                // },
               })} />
             <label class="label">
               {errors.password?.type === "required" && (
@@ -95,11 +108,11 @@ const Login = () => {
                   {errors?.password?.message}
                 </span>
               )}
-              {errors.password?.type === "pattern" && (
+              {/* {errors.password?.type === "pattern" && (
                 <span class="label-text-alt text-red-600">
                   {errors?.password?.message}
                 </span>
-              )}
+              )} */}
             </label>
           </div>
           <div className='max-w-[600px] w-full flex justify-end items-start'>
