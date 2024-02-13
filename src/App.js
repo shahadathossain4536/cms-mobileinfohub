@@ -7,6 +7,7 @@ import Dashboard from './Pages/Dashboard/Dashboard';
 import DashboardHome from './Pages/DashboardHome/DashboardHome';
 import AddDevices from './Pages/AddDevices/AddDevices';
 import AddBrandName from './Pages/AddBrandName/AddBrandName';
+import PrivateRoute from './component/HOC/PrivateRoute';
 
 function App() {
   return (
@@ -14,8 +15,12 @@ function App() {
       <Route path="/" element={<Login />} />
       <Route path="/login" element={<Login />} />
       <Route path="/registration" element={<Registration />} />
-      <Route path="dashboard" element={<Dashboard />} >
-        <Route index element={<DashboardHome />} />
+      <Route path="dashboard" element={<PrivateRoute>
+        <Dashboard />
+      </PrivateRoute>} >
+        <Route index element={
+          <DashboardHome />
+        } />
         <Route path='add-brand-name' element={<AddBrandName />} />
         <Route path='add-device' element={<AddDevices />} />
 
