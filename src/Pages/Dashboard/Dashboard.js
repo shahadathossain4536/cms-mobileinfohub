@@ -14,6 +14,7 @@ const Dashboard = () => {
           <Link className={`w-full h-10 ${pathname === '/dashboard' && 'bg-slate-200'}   rounded-md flex justify-center items-center my-2`} to='/dashboard'>Home</Link>
           <Link className={`w-full h-10 ${pathname === '/dashboard/add-brand-name' && 'bg-slate-200'}   rounded-md flex justify-center items-center my-2`} to='/dashboard/add-brand-name'>Add Brand</Link>
           <Link className={`w-full h-10 ${pathname === '/dashboard/add-device' && 'bg-slate-200'}   rounded-md flex justify-center items-center my-2`} to='/dashboard/add-device'>Add Device</Link>
+          <Link className={`w-full h-10 ${pathname === '/dashboard/add-devices-test' && 'bg-slate-200'}   rounded-md flex justify-center items-center my-2`} to='/dashboard/add-devices-test'>Add Devices Test</Link>
         </div>
         <div className='w-full py-2 px-4 flex justify-center items-center'>
           <Outlet/>

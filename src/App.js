@@ -9,6 +9,7 @@ import AddDevices from './Pages/AddDevices/AddDevices';
 import AddBrandName from './Pages/AddBrandName/AddBrandName';
 import PrivateRoute from './component/HOC/PrivateRoute';
 import { Toaster } from 'react-hot-toast';
+import AddDevicesTest from './Pages/AddDevicesTest/AddDevicesTest';
 
 function App() {
   return (
@@ -31,6 +32,7 @@ function App() {
           } />
           <Route path='add-brand-name' element={<AddBrandName />} />
           <Route path='add-device' element={<AddDevices />} />
+          <Route path='add-devices-test' element={<AddDevicesTest />} />
 
         </Route>
 
