@@ -31,7 +31,50 @@ const AddDevices = () => {
   const [imageDeleteHash, setImageDeleteHash] = useState(null);
   const [bannerImage, setBannerImage] = useState(null);
   const [uploadedPhotoUrls, setUploadedPhotoUrls] = useState([]);
-  console.log("uploadedPhotoUrls",uploadedPhotoUrls);
+  const [expandableStorageType, setExpandableStorageType] = useState("");
+  const [cameraType, setCameraType] = useState("");
+  const [numberOfInputs, setNumberOfInputs] = useState(0);
+  const [backCameraNumber, setBackCameraNumber] = useState();
+  const [frontCameraNumber, setFrontCameraNumber] = useState();
+  const [showFormSection, setShowFormSection] = useState(false);
+
+  // Define the function to handle the Create button click
+  const handleCreateButtonClick = (cameraName) => {
+    console.log("cameraNamecameraName", cameraName);
+    // Ensure backCameraNumber is a positive integer
+    const numberOfInputs = parseInt(backCameraNumber, 10);
+
+    if (isNaN(numberOfInputs) || numberOfInputs <= 0) {
+      // Handle invalid input (e.g., show an error message)
+      return;
+    }
+
+    // Call handleAddInput to update the state with the specified number of inputs
+    handleCameraInput(cameraName, numberOfInputs);
+
+    // Show the form section
+    setShowFormSection(true);
+  };
+  const handleSelfieCameraInput = (cameraName) => {
+    console.log("cameraNamecameraName", cameraName);
+    // Ensure backCameraNumber is a positive integer
+    const numberOfInputs = parseInt(frontCameraNumber, 10);
+
+    if (isNaN(numberOfInputs) || numberOfInputs <= 0) {
+      // Handle invalid input (e.g., show an error message)
+      return;
+    }
+
+    // Call handleAddInput to update the state with the specified number of inputs
+    handleCameraInput(cameraName, numberOfInputs);
+
+    // Show the form section
+    setShowFormSection(true);
+  };
+
+  // const [inputValues, setInputValues] = useState(Array(numberOfInputs).fill(""));
+
+  console.log("uploadedPhotoUrls", uploadedPhotoUrls);
   const token = window.localStorage.getItem("token");
 
   console.log("imageDeleteHashimageDeleteHash", imageDeleteHash);
@@ -62,7 +105,7 @@ const AddDevices = () => {
       if (selectedImage) {
         const formData = new FormData();
         formData.append('image', selectedImage);
-  
+
         const response = await axios.post('https://api.imgbb.com/1/upload', formData, {
           headers: {
             'Content-Type': 'multipart/form-data',
@@ -71,23 +114,23 @@ const AddDevices = () => {
             key: '04ece4ca20ee040e0e21680d6591ddfe', // Replace with your actual API key
           },
         });
-  
+
         if (response.data.status === 200) {
           // Image uploaded successfully, get the deletehash
           const deleteHash = response.data.data.delete_url;
           const bannerImageRes = response.data.data.display_url;
-  
+
           // Now you can use this deletehash to delete the image later
           console.log('Image uploaded successfully. Deletehash:', response.data);
-  
+
           // Show the delete button and store the deletehash in your component state
           setDeleteButtonVisible(true);
           setImageDeleteHash(deleteHash);
           setBannerImage(bannerImageRes)
-  
+
           // Show success toast
           toast.success('Image uploaded successfully');
-  
+
           // Set the upload status to true
           setIsUploadSuccessful(true);
         } else {
@@ -100,7 +143,7 @@ const AddDevices = () => {
       }
     } catch (error) {
       console.error('Error uploading image to ImgBB:', error);
-  
+
       // Show error toast
       toast.error('Error uploading image. Please try again later.', { duration: 4000 });
       // Handle the error as needed
@@ -171,14 +214,14 @@ const AddDevices = () => {
         if (photo) {
           const formData = new FormData();
           formData.append('image', photo);
-  
+
           const response = await fetch('https://api.imgbb.com/1/upload?key=' + apiKey, {
             method: 'POST',
             body: formData,
           });
-  
+
           const result = await response.json();
-  
+
           if (result.success) {
             // Photo uploaded successfully, save the URL
             setUploadedPhotoUrls((prevUrls) => [...prevUrls, result.data.url]);
@@ -188,10 +231,10 @@ const AddDevices = () => {
           }
         }
       });
-  
+
       // Wait for all uploads to complete
       await Promise.all(uploadPromises);
-  
+
       // Show success toast after all uploads are complete
       toast.success('All photos uploaded successfully');
     } catch (error) {
@@ -229,13 +272,13 @@ const AddDevices = () => {
       { name: "Card Slot", subData: "" },
       { name: "Internal", subData: "" },
     ],
-    mainCamera: [
-      { name: "", subData: "" },
+    main_camera: [
+      // { name: "", subData: "" },
       { name: "Features", subData: "" },
       { name: "Video", subData: "" },
     ],
-    selfieCamera: [
-      { name: "", subData: "" },
+    selfie_camera: [
+      // { name: "", subData: "" },
       { name: "Features", subData: "" },
       { name: "Video", subData: "" },
     ],
@@ -243,7 +286,7 @@ const AddDevices = () => {
       { name: "Loudspeaker", subData: "" },
       { name: "3.5mm jack", subData: "" },
     ],
-    commination: [
+    comms: [
       { name: "WLAN", subData: "" },
       { name: "Bluetooth", subData: "" },
       { name: "Positioning", subData: "" },
@@ -264,16 +307,36 @@ const AddDevices = () => {
 
   const numberOfArrays = Object.keys(inputData).length;
 
-  const handleAddInput = (section) => {
+  const handleCameraInput = (section, count = 1) => {
     const updatedData = { ...inputData };
 
     if (!Array.isArray(updatedData[section])) {
       updatedData[section] = [];
     }
 
-    updatedData[section] = [...updatedData[section], { name: "", subData: "" }];
+    // Use Array.from to create an array with the specified count
+    const newInputs = Array.from({ length: count }, () => ({ name: "", subData: "" }));
+
+    // Insert new inputs at the beginning of the array
+    updatedData[section] = [...newInputs, ...updatedData[section]];
+
     setInputData(updatedData);
   };
+
+  const handleAddInput = (section, count = 1) => {
+    const updatedData = { ...inputData };
+
+    if (!Array.isArray(updatedData[section])) {
+      updatedData[section] = [];
+    }
+
+    // Use Array.from to create an array with the specified count
+    const newInputs = Array.from({ length: count }, () => ({ name: "", subData: "" }));
+
+    updatedData[section] = [...updatedData[section], ...newInputs];
+    setInputData(updatedData);
+  };
+
 
   const handleInputChange = (section, index, key, value) => {
     const updatedData = { ...inputData };
@@ -316,7 +379,7 @@ const AddDevices = () => {
   }, []);
   const onSubmit = async (data) => {
 
-  
+
     const devicesData = {
       brand: `${selectedOption?.label}`,
       deviceName: `${data.modelName}`,
@@ -324,6 +387,11 @@ const AddDevices = () => {
       banner_img: bannerImage,
       galleryPhoto: uploadedPhotoUrls,
       weight: `${data.weight}`,
+      backCamera: `${data.backCamera}`,
+      backCameraVideo: `${data.backCameraVideo}`,
+      battery: `${data.battery}`,
+      chargingSpeed: `${data.chargingSpeed}`,
+      processor: `${data.processor}`,
       thickness: `${data.thickness}`,
       os_android: `${data.os_android}`,
       os_brand: `${data.os_brand}`,
@@ -338,7 +406,7 @@ const AddDevices = () => {
         subType,
       })),
     };
-  console.log("devicesData",devicesData);
+    // console.log("devicesData", devicesData);
     try {
       const response = await axios.post("http://localhost:2000/api/devicesData", devicesData, {
         headers: {
@@ -430,17 +498,17 @@ const AddDevices = () => {
                   {console.log("isImageSelected", isImageSelected)}
                   {selectedImage && (
                     <button
-                    type="button" 
-                    onClick={handleUploadButtonClick}
-                    disabled={isUploadSuccessful} // Disable the button if the upload is successful
-                    className="max-w-[150px] w-full h-[40px] bg-blue-500 text-white rounded-md outline-none px-3 cursor-pointer disabled:bg-slate-200"
-                  >
-                    Upload
-                  </button>
+                      type="button"
+                      onClick={handleUploadButtonClick}
+                      disabled={isUploadSuccessful} // Disable the button if the upload is successful
+                      className="max-w-[150px] w-full h-[40px] bg-blue-500 text-white rounded-md outline-none px-3 cursor-pointer disabled:bg-slate-200"
+                    >
+                      Upload
+                    </button>
                   )}
                   {deleteButtonVisible && (
                     <button
-                    type="button" 
+                      type="button"
                       className="max-w-[150px] w-full h-[40px] bg-red-500 text-white rounded-md outline-none px-3 cursor-pointer"
                       onClick={() => handleDeleteButtonClick(imageDeleteHash)}
                     >
@@ -555,23 +623,17 @@ const AddDevices = () => {
 
                 {expandableStorageOption === "yes" && (
                   <div className="w-full">
-                    <label htmlFor="expandableStorageType">
-                      Expandable Storage Type:
-                    </label>
-                    <input
-                      type="text"
+                    <label htmlFor="expandableStorageType">Expandable Storage Type:</label>
+                    <select
                       id="expandableStorageType"
-                      name="expandableStorageType"
+                      value={expandableStorageType}
+                      onChange={(e) => setExpandableStorageType(e.target.value)}
                       className="max-w-[560px] h-12 border-[2px] border-gray-500 rounded-md outline-none px-3 w-full"
-                      {...register("expandable_storage_type", {
-                        required: {
-                          value: true,
-                          message: "Enter Your Brand Name",
-                        },
-                      })}
-
-                    // Add other attributes as needed
-                    />
+                    >
+                      <option value="">Select Storage Type</option>
+                      <option value="microSDXC">microSDXC</option>
+                      <option value="Nano Memory">Nano Memory</option>
+                    </select>
                   </div>
                 )}
               </div>
@@ -619,6 +681,76 @@ const AddDevices = () => {
                     </span>
                   )}
                 </div>
+              </div>
+              <div className="w-full flex gap-4">
+                <div className="w-full">
+                  <label htmlFor="">Back Camera</label>
+                  <input
+                    className="max-w-[560px] h-12 border-[2px] border-gray-500 rounded-md outline-none px-3 w-full"
+                    type="text"
+                    {...register("backCamera", {
+
+
+                    })}
+                  />
+
+                </div>
+
+                <div className="w-full">
+                  <label htmlFor="">Back Camera Video</label>
+                  <input
+                    className="max-w-[560px] h-12 border-[2px] border-gray-500 rounded-md outline-none px-3 w-full"
+                    type="text"
+                    {...register("backCameraVideo", {
+
+
+                    })}
+                  />
+
+                </div>
+              </div>
+              <div className="w-full flex gap-4">
+                <div className="w-full">
+                  <label htmlFor="">Battery</label>
+                  <input
+                    className="max-w-[560px] h-12 border-[2px] border-gray-500 rounded-md outline-none px-3 w-full"
+                    type="text"
+                    {...register("battery", {
+
+
+                    })}
+                  />
+
+                </div>
+
+                <div className="w-full">
+                  <label htmlFor="">Charging Speed</label>
+                  <input
+                    className="max-w-[560px] h-12 border-[2px] border-gray-500 rounded-md outline-none px-3 w-full"
+                    type="text"
+                    {...register("chargingSpeed", {
+
+
+                    })}
+                  />
+
+                </div>
+              </div>
+              <div className="w-full flex gap-4">
+                <div className="w-full">
+                  <label htmlFor="">Processor</label>
+                  <input
+                    className="max-w-[560px] h-12 border-[2px] border-gray-500 rounded-md outline-none px-3 w-full"
+                    type="text"
+                    {...register("processor", {
+
+
+                    })}
+                  />
+
+                </div>
+
+
               </div>
             </div>
           )}
@@ -678,22 +810,78 @@ const AddDevices = () => {
             />
           )}
           {step === 8 && (
-            <StepFormSection
-              sectionName="mainCamera"
-              sectionData={inputData.mainCamera}
-              handleInputChange={handleInputChange}
-              handleDeleteInput={handleDeleteInput}
-              handleAddInput={handleAddInput}
-            />
+
+            <div className='w-full'>
+              {
+                !showFormSection && <div className='flex flex-col gap-4 w-full'>
+                  <label htmlFor="back_camera_number">Enter Back Camera Number</label>
+                  <input
+                    className='h-12 border-[2px] w-full border-gray-500 rounded-md outline-none px-3 appearance-none'
+                    type="number"
+                    id="back_camera_number"
+                    value={backCameraNumber}
+
+                    onChange={(e) => setBackCameraNumber(Math.max(0, parseInt(e.target.value, 10)))}
+                  />
+                  <button
+                    type="button"
+                    className='bg-green-500 rounded-lg w-full text-white text-xs h-12 px-1'
+                    onClick={() => handleCreateButtonClick("main_camera")}
+                  >
+                    Create Input
+                  </button>
+
+                </div>
+              }
+
+              {showFormSection && (
+                <div>
+                  <StepFormSection
+                    sectionName="main_camera"
+                    sectionData={inputData.main_camera}
+                    handleInputChange={handleInputChange}
+                    handleDeleteInput={handleDeleteInput}
+                    handleAddInput={handleAddInput}
+                  />
+                </div>
+              )}
+            </div>
+
           )}
           {step === 9 && (
-            <StepFormSection
-              sectionName="selfieCamera"
-              sectionData={inputData.selfieCamera}
-              handleInputChange={handleInputChange}
-              handleDeleteInput={handleDeleteInput}
-              handleAddInput={handleAddInput}
-            />
+
+            <div className='w-full'>
+              {!showFormSection && (
+                <div className='flex flex-col gap-4 w-full'>
+                  <label htmlFor="front_camera_number">Enter Front Camera Number</label>
+                  <input
+                    className='h-12 border-[2px] w-full border-gray-500 rounded-md outline-none px-3 appearance-none'
+                    type="number"
+                    id="front_camera_number"
+                    value={frontCameraNumber}
+                    onChange={(e) => setFrontCameraNumber(Math.max(0, parseInt(e.target.value, 10)))}
+                  />
+                  <button
+                    type="button"
+                    className='bg-green-500 rounded-lg w-full text-white text-xs h-12 px-1'
+                    onClick={() => handleSelfieCameraInput("selfie_camera")}
+                  >
+                    Create Input
+                  </button>
+                </div>
+              )}
+              {showFormSection && (
+                <StepFormSection
+                  sectionName="selfie_camera"
+                  sectionData={inputData.selfie_camera}
+                  handleInputChange={handleInputChange}
+                  handleDeleteInput={handleDeleteInput}
+                  handleAddInput={handleAddInput}
+                />
+              )}
+            </div>
+
+
           )}
           {step === 10 && (
             <StepFormSection
@@ -706,8 +894,8 @@ const AddDevices = () => {
           )}
           {step === 11 && (
             <StepFormSection
-              sectionName="commination"
-              sectionData={inputData.commination}
+              sectionName="comms"
+              sectionData={inputData.comms}
               handleInputChange={handleInputChange}
               handleDeleteInput={handleDeleteInput}
               handleAddInput={handleAddInput}
@@ -751,68 +939,68 @@ const AddDevices = () => {
           )}
           {step === 16 && (
             <div className="w-full">
-  <p className="text-center mt-3 mb-6 text-2xl">Set Photo Gallery</p>
+              <p className="text-center mt-3 mb-6 text-2xl">Set Photo Gallery</p>
 
-<div className="flex flex-wrap gap-3">
-<div className="flex flex-wrap gap-3">
-    {photoGallery.map((photo, index) => (
-      <div className="flex" key={index}>
-        {!photo && (
-          <input
-            type="file"
-            accept="image/*"
-            className="appearance-none max-w-[200px] w-full h-[300px] cursor-pointer relative after:absolute after:max-w-[200px] after:w-full after:h-[300px] after:bg-slate-200 after:top-0 after:left-0 after:right-0 after:bottom-0 after:border-dashed after:border-[2px] after:px-2 after:rounded-lg after:border-black"
-            onChange={(e) => handlePhotoChange(e, index)}
-          />
-        )}
-        {photo && (
-          <div>
-            <div className="relative max-w-[200px] w-full h-[300px] bg-slate-100 border-dashed border-[2px] border-black p-2 rounded-lg">
-              <img
-                src={URL.createObjectURL(photo)}
-                alt={`Preview ${index + 1}`}
-                className="m-0 max-w-[200px] w-full h-[280px] object-contain"
-              />
-              <button
-                type="button"
-                className="absolute top-[-12px] right-[-8px]"
-                onClick={() => handleDeletePhoto(index)}
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 24 24"
-                  width="24"
-                  height="24"
-                  fill="rgba(0,0,0,1)"
+              <div className="flex flex-wrap gap-3">
+                <div className="flex flex-wrap gap-3">
+                  {photoGallery.map((photo, index) => (
+                    <div className="flex" key={index}>
+                      {!photo && (
+                        <input
+                          type="file"
+                          accept="image/*"
+                          className="appearance-none max-w-[200px] w-full h-[300px] cursor-pointer relative after:absolute after:max-w-[200px] after:w-full after:h-[300px] after:bg-slate-200 after:top-0 after:left-0 after:right-0 after:bottom-0 after:border-dashed after:border-[2px] after:px-2 after:rounded-lg after:border-black"
+                          onChange={(e) => handlePhotoChange(e, index)}
+                        />
+                      )}
+                      {photo && (
+                        <div>
+                          <div className="relative max-w-[200px] w-full h-[300px] bg-slate-100 border-dashed border-[2px] border-black p-2 rounded-lg">
+                            <img
+                              src={URL.createObjectURL(photo)}
+                              alt={`Preview ${index + 1}`}
+                              className="m-0 max-w-[200px] w-full h-[280px] object-contain"
+                            />
+                            <button
+                              type="button"
+                              className="absolute top-[-12px] right-[-8px]"
+                              onClick={() => handleDeletePhoto(index)}
+                            >
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                viewBox="0 0 24 24"
+                                width="24"
+                                height="24"
+                                fill="rgba(0,0,0,1)"
+                              >
+                                <path d="M12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12C22 17.5228 17.5228 22 12 22ZM12 10.5858L9.17157 7.75736L7.75736 9.17157L10.5858 12L7.75736 14.8284L9.17157 16.2426L12 13.4142L14.8284 16.2426L16.2426 14.8284L13.4142 12L16.2426 9.17157L14.8284 7.75736L12 10.5858Z"></path>
+                              </svg>
+                            </button>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+                <button
+                  type="button"
+                  className="max-w-[200px] w-full h-[300px] bg-slate-200 rounded-lg "
+                  onClick={handleAddPhotoInput}
                 >
-                  <path d="M12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12C22 17.5228 17.5228 22 12 22ZM12 10.5858L9.17157 7.75736L7.75736 9.17157L10.5858 12L7.75736 14.8284L9.17157 16.2426L12 13.4142L14.8284 16.2426L16.2426 14.8284L13.4142 12L16.2426 9.17157L14.8284 7.75736L12 10.5858Z"></path>
-                </svg>
-              </button>
-            </div>
-          </div>
-        )}
-      </div>
-    ))}
-  </div>
-  <button
-    type="button"
-    className="max-w-[200px] w-full h-[300px] bg-slate-200 rounded-lg "
-    onClick={handleAddPhotoInput}
-  >
-    Add Photo
-  </button>
-</div>
-  {photoGallery.some(photo => photo) && (
-    <button
-      type="button"
-      className="max-w-[200px] w-full h-[50px] bg-blue-500 rounded-lg"
-      onClick={galleryPhotoUpload}
-    >
-      Upload All Photos
-    </button>
-  )}
+                  Add Photo
+                </button>
+              </div>
+              {photoGallery.some(photo => photo) && (
+                <button
+                  type="button"
+                  className="max-w-[200px] w-full h-[50px] bg-blue-500 rounded-lg"
+                  onClick={galleryPhotoUpload}
+                >
+                  Upload All Photos
+                </button>
+              )}
 
-</div>
+            </div>
 
 
 
@@ -824,7 +1012,7 @@ const AddDevices = () => {
           <div className="w-full flex justify-center items-center gap-5 my-6">
             {step > 1 && (
               <button
-              type="button" 
+                type="button"
                 onClick={() => setStep(step - 1)}
                 className=" h-12 bg-gray-500 rounded-md outline-none px-3 text-white cursor-pointer w-full"
               >
@@ -832,14 +1020,14 @@ const AddDevices = () => {
               </button>
             )}
             {step < 16 && (
-             <button
-             type="button"  // Set the button type to "button" to prevent form submission
-             onClick={() => setStep(step + 1)}
-             className="h-12 bg-gray-500 rounded-md outline-none px-3 text-white cursor-pointer w-full"
-           >
-             Next
-           </button>
-           
+              <button
+                type="button"  // Set the button type to "button" to prevent form submission
+                onClick={() => [setStep(step + 1), setShowFormSection(false)]}
+                className="h-12 bg-gray-500 rounded-md outline-none px-3 text-white cursor-pointer w-full"
+              >
+                Next
+              </button>
+
             )}
           </div>
           {step === 16 && (
