@@ -25,6 +25,7 @@ const AddDevices = () => {
   const [step, setStep] = useState(1);
   const [imagePreviewUrl, setImagePreviewUrl] = useState(null);
   const [photoGallery, setPhotoGallery] = useState([null]);
+  console.log("photoGallery",photoGallery);
   const [startDate, setStartDate] = useState(null);
   const [expandableStorageOption, setExpandableStorageOption] = useState("no");
   const [isImageSelected, setIsImageSelected] = useState(false);
@@ -391,7 +392,7 @@ const AddDevices = () => {
         subType,
       })),
     };
-   
+
     try {
       const response = await axios.post("http://localhost:2000/api/devicesData", devicesData, {
         headers: {

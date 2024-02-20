@@ -15,8 +15,25 @@ const UpdateDevice = () => {
     formState: { errors },
     handleSubmit,
   } = useForm();
+
   useEffect(() => {
-    console.log("Fetching data for id:", id);
+    const fetchData = async () => {
+      try {
+        const response = await axios.get("http://localhost:2000/api/brandName");
+
+        const formattedData = response.data.brandNames.map((brand) => ({
+          label: brand.name,
+        }));
+        setBrandOption(formattedData);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+
+    fetchData();
+  }, []);
+  useEffect(() => {
+
 
     const fetchData = async () => {
       try {
@@ -24,7 +41,7 @@ const UpdateDevice = () => {
           `http://localhost:2000/api/devicesData/${id}`
         );
         const data = response.data;
-        console.log("Response data:", data);
+
 
         setDeviceDataOnly(data);
       } catch (error) {
@@ -42,12 +59,13 @@ const UpdateDevice = () => {
   const [isRtl, setIsRtl] = useState(false);
   const [selectedOption, setSelectedOption] = useState(null);
   const [brandOption, setBrandOption] = useState([]);
-  console.log("selectedOption", selectedOption);
+
   const [selectedImage, setSelectedImage] = useState(null);
   const [step, setStep] = useState(1);
   const [imagePreviewUrl, setImagePreviewUrl] = useState();
-  console.log("imagePreviewUrl", deviceDataOnly?.banner_img);
+
   const [photoGallery, setPhotoGallery] = useState([null]);
+
   const [startDate, setStartDate] = useState(null);
   const [expandableStorageOption, setExpandableStorageOption] = useState("no");
   const [isImageSelected, setIsImageSelected] = useState(false);
@@ -68,45 +86,43 @@ const UpdateDevice = () => {
 
     if (matchedOption) {
       setSelectedOption(matchedOption);
-      console.log("matchedOptionmatchedOption", matchedOption);
+
     }
     // Set the banner_img for image preview
     if (deviceDataOnly && deviceDataOnly.banner_img) {
       setImagePreviewUrl(deviceDataOnly.banner_img);
     }
     if (deviceDataOnly && deviceDataOnly.expandable_storage) {
-        setExpandableStorageOption(deviceDataOnly.expandable_storage);
+      setExpandableStorageOption(deviceDataOnly.expandable_storage);
     }
     if (deviceDataOnly && deviceDataOnly.expandable_storage_type) {
-        setExpandableStorageType(deviceDataOnly.expandable_storage_type);
+      setExpandableStorageType(deviceDataOnly.expandable_storage_type);
+    }
+    if (deviceDataOnly && deviceDataOnly?.galleryPhoto) {
+      setPhotoGallery(deviceDataOnly?.galleryPhoto);
     }
   }, [deviceDataOnly, brandOption]);
 
+  const { data } = deviceDataOnly || {};
 
-
-  // Assuming your full data is available in deviceDataOnly
-const { data } = deviceDataOnly || {};
-
-// Find the network data
-const getDataByType = (data, targetType) => data && data.find(entry => entry.type === targetType);
-
-const networkData = getDataByType(data, 'network');
-const launchData = getDataByType(data, 'launch');
-const bodyData = getDataByType(data, 'body');
-const displayData = getDataByType(data, 'display');
-const platformData = getDataByType(data, 'platform');
-const memoryData = getDataByType(data, 'memory');
-const main_cameraData = getDataByType(data, 'main_camera');
-const selfie_cameraData = getDataByType(data, 'selfie_camera');
-const soundData = getDataByType(data, 'sound');
-const commsData = getDataByType(data, 'comms');
-const featuresData = getDataByType(data, 'features');
-const batteryData = getDataByType(data, 'battery');
-const colorData = getDataByType(data, 'color');
-const priceData = getDataByType(data, 'price');
+  const getDataByType = (data, targetType) => data && data.find(entry => entry.type === targetType);
+  const networkData = getDataByType(data, 'network');
+  const launchData = getDataByType(data, 'launch');
+  const bodyData = getDataByType(data, 'body');
+  const displayData = getDataByType(data, 'display');
+  const platformData = getDataByType(data, 'platform');
+  const memoryData = getDataByType(data, 'memory');
+  const main_cameraData = getDataByType(data, 'main_camera');
+  const selfie_cameraData = getDataByType(data, 'selfie_camera');
+  const soundData = getDataByType(data, 'sound');
+  const commsData = getDataByType(data, 'comms');
+  const featuresData = getDataByType(data, 'features');
+  const batteryData = getDataByType(data, 'battery');
+  const colorData = getDataByType(data, 'color');
+  const priceData = getDataByType(data, 'price');
   // Define the function to handle the Create button click
   const handleCreateButtonClick = (cameraName) => {
-    console.log("cameraNamecameraName", cameraName);
+
     // Ensure backCameraNumber is a positive integer
     const numberOfInputs = parseInt(backCameraNumber, 10);
 
@@ -122,7 +138,7 @@ const priceData = getDataByType(data, 'price');
     setShowFormSection(true);
   };
   const handleSelfieCameraInput = (cameraName) => {
-    console.log("cameraNamecameraName", cameraName);
+
     // Ensure backCameraNumber is a positive integer
     const numberOfInputs = parseInt(frontCameraNumber, 10);
 
@@ -142,22 +158,40 @@ const priceData = getDataByType(data, 'price');
     setExpandableStorageOption(e.target.value);
   };
 
+  // const handlePhotoChange = (e, index) => {
+  //   const files = e.target.files;
+  //   const filesArray = Array.from(files);
+
+  //   setPhotoGallery((prevGallery) => {
+  //     const updatedGallery = [...prevGallery];
+  //     updatedGallery[index] = filesArray[0];
+
+  //     // Check if an image is selected
+  //     const hasImageSelected = updatedGallery.some((photo) => photo !== null);
+  //     setIsImageSelected(hasImageSelected);
+
+  //     return updatedGallery;
+  //   });
+  // };
+  // const handleDeletePhoto = (index) => {
+  //   setPhotoGallery((prevGallery) => {
+  //     const updatedGallery = [...prevGallery];
+  //     updatedGallery.splice(index, 1);
+  //     return updatedGallery;
+  //   });
+  // };
+
   const handlePhotoChange = (e, index) => {
-    const files = e.target.files;
-    const filesArray = Array.from(files);
-
-    setPhotoGallery((prevGallery) => {
-      const updatedGallery = [...prevGallery];
-      updatedGallery[index] = filesArray[0];
-
-      // Check if an image is selected
-      const hasImageSelected = updatedGallery.some((photo) => photo !== null);
-      setIsImageSelected(hasImageSelected);
-
-      return updatedGallery;
-    });
+    const newGallery = [...photoGallery];
+    newGallery[index] = URL.createObjectURL(e.target.files[0]);
+    setPhotoGallery(newGallery);
   };
 
+  const handleDeletePhoto = (index) => {
+    const newGallery = [...photoGallery];
+    newGallery.splice(index, 1); // Remove the photo at the specified index
+    setPhotoGallery(newGallery);
+  };
   const handleUploadButtonClick = async () => {
     try {
       // Check if an image is selected
@@ -183,11 +217,7 @@ const priceData = getDataByType(data, 'price');
           const deleteHash = response.data.data.delete_url;
           const bannerImageRes = response.data.data.display_url;
 
-          // Now you can use this deletehash to delete the image later
-          console.log(
-            "Image uploaded successfully. Deletehash:",
-            response.data
-          );
+
 
           // Show the delete button and store the deletehash in your component state
           setDeleteButtonVisible(true);
@@ -203,7 +233,7 @@ const priceData = getDataByType(data, 'price');
           toast.error("Failed to upload image");
         }
       } else {
-        console.log("No image selected to upload.");
+
         // Show error toast if no image selected
         toast.error("Please select an image to upload.", { duration: 4000 });
       }
@@ -219,7 +249,7 @@ const priceData = getDataByType(data, 'price');
   };
 
   const handleDeleteButtonClick = async (deleteUrl) => {
-    console.log("deleteUrl-------------", deleteUrl);
+
 
     // try {
     //   // Extract delete hash from the delete URL
@@ -257,13 +287,7 @@ const priceData = getDataByType(data, 'price');
     //   toast.error('Error deleting image. Check console for details.');
     // }
   };
-  const handleDeletePhoto = (index) => {
-    setPhotoGallery((prevGallery) => {
-      const updatedGallery = [...prevGallery];
-      updatedGallery.splice(index, 1);
-      return updatedGallery;
-    });
-  };
+
 
   const handleAddPhotoInput = () => {
     setPhotoGallery((prevGallery) => [...prevGallery, null]);
@@ -430,50 +454,35 @@ const priceData = getDataByType(data, 'price');
     }
   };
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await axios.get("http://localhost:2000/api/brandName");
-
-        const formattedData = response.data.brandNames.map((brand) => ({
-          label: brand.name,
-        }));
-        setBrandOption(formattedData);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    };
-
-    fetchData();
-  }, []);
+  console.log("selectedOption", selectedOption);
   const onSubmit = async (data) => {
     const devicesData = {
       brand: `${selectedOption?.label}`,
-      deviceName: `${data.modelName}`,
-      release_date: data.release_date,
-      banner_img: bannerImage,
-      galleryPhoto: uploadedPhotoUrls,
-      weight: `${data.weight}`,
-      backCamera: `${data.backCamera}`,
-      backCameraVideo: `${data.backCameraVideo}`,
-      battery: `${data.battery}`,
-      chargingSpeed: `${data.chargingSpeed}`,
-      processor: `${data.processor}`,
-      thickness: `${data.thickness}`,
-      os_android: `${data.os_android}`,
-      os_brand: `${data.os_brand}`,
-      displaySize: `${data.displaySize}`,
-      displayResolution: `${data.displayResolution}`,
+      deviceName: `${data.modelName || deviceDataOnly?.deviceName}`,
+      release_date: `${data.release_date || deviceDataOnly?.release_date}`,
+      banner_img: `${bannerImage || imagePreviewUrl}`,
+      galleryPhoto: uploadedPhotoUrls || photoGallery,
+      weight: `${data.weight || deviceDataOnly?.weight}`,
+      backCamera: `${data.backCamera || deviceDataOnly?.backCamera}`,
+      backCameraVideo: `${data.backCameraVideo || deviceDataOnly?.backCameraVideo}`,
+      battery: `${data.battery || deviceDataOnly?.battery}`,
+      chargingSpeed: `${data.chargingSpeed || deviceDataOnly?.chargingSpeed}`,
+      processor: `${data.processor || deviceDataOnly?.processor}`,
+      thickness: `${data.thickness || deviceDataOnly?.thickness}`,
+      os_android: `${data.os_android || deviceDataOnly?.os_android}`,
+      os_brand: `${data.os_brand || deviceDataOnly?.os_brand}`,
+      displaySize: `${data.displaySize || deviceDataOnly?.displaySize}`,
+      displayResolution: `${data.displayResolution || deviceDataOnly?.displayResolution}`,
       expandable_storage: expandableStorageOption,
-      expandable_storage_type: `${data.expandable_storage_type}`,
-      ram: `${data.ram}`,
-      storage: `${data.storage}`,
+      expandable_storage_type: `${data.expandable_storage_type || deviceDataOnly?.expandable_storage_type}`,
+      ram: `${data.ram || deviceDataOnly?.release_date}`,
+      storage: `${data.storage || deviceDataOnly?.storage}`,
       data: Object.entries(inputData).map(([type, subType]) => ({
         type,
         subType,
       })),
     };
-  
+    console.log("devicesData", devicesData);
     try {
       const response = await axios.put(
         `http://localhost:2000/api/devicesData/${id}`, // Use PUT request for updating data
@@ -485,7 +494,7 @@ const priceData = getDataByType(data, 'price');
           },
         }
       );
-      console.log('Device updated successfully:', response.data);
+      console.log("UpdateResponse", response);
       // Add any further logic or redirection after successful submission
       toast.success('Device updated successfully');
     } catch (error) {
@@ -801,8 +810,8 @@ const priceData = getDataByType(data, 'price');
             <StepFormSection
               sectionName="network"
               sectionData={networkData ? networkData.subType : []}
-            
-              
+
+
               handleInputChange={handleInputChange}
               handleDeleteInput={handleDeleteInput}
               handleAddInput={handleAddInput}
@@ -847,7 +856,7 @@ const priceData = getDataByType(data, 'price');
           {step === 7 && (
             <StepFormSection
               sectionName="memory"
-              sectionData={launchData ? launchData.subType : []}
+              sectionData={memoryData ? memoryData.subType : []}
               handleInputChange={handleInputChange}
               handleDeleteInput={handleDeleteInput}
               handleAddInput={handleAddInput}
@@ -885,7 +894,7 @@ const priceData = getDataByType(data, 'price');
                 <div>
                   <StepFormSection
                     sectionName="main_camera"
-                    sectionData={inputData.main_camera}
+                    sectionData={main_cameraData ? main_cameraData.subType : []}
                     handleInputChange={handleInputChange}
                     handleDeleteInput={handleDeleteInput}
                     handleAddInput={handleAddInput}
@@ -924,7 +933,7 @@ const priceData = getDataByType(data, 'price');
               {showFormSection && (
                 <StepFormSection
                   sectionName="selfie_camera"
-                  sectionData={inputData.selfie_camera}
+                  sectionData={selfie_cameraData ? selfie_cameraData.subType : []}
                   handleInputChange={handleInputChange}
                   handleDeleteInput={handleDeleteInput}
                   handleAddInput={handleAddInput}
@@ -935,7 +944,7 @@ const priceData = getDataByType(data, 'price');
           {step === 10 && (
             <StepFormSection
               sectionName="sound"
-              sectionData={inputData.sound}
+              sectionData={soundData ? soundData.subType : []}
               handleInputChange={handleInputChange}
               handleDeleteInput={handleDeleteInput}
               handleAddInput={handleAddInput}
@@ -944,7 +953,7 @@ const priceData = getDataByType(data, 'price');
           {step === 11 && (
             <StepFormSection
               sectionName="comms"
-              sectionData={inputData.comms}
+              sectionData={commsData ? commsData.subType : []}
               handleInputChange={handleInputChange}
               handleDeleteInput={handleDeleteInput}
               handleAddInput={handleAddInput}
@@ -953,7 +962,7 @@ const priceData = getDataByType(data, 'price');
           {step === 12 && (
             <StepFormSection
               sectionName="features"
-              sectionData={inputData.features}
+              sectionData={featuresData ? featuresData.subType : []}
               handleInputChange={handleInputChange}
               handleDeleteInput={handleDeleteInput}
               handleAddInput={handleAddInput}
@@ -962,7 +971,7 @@ const priceData = getDataByType(data, 'price');
           {step === 13 && (
             <StepFormSection
               sectionName="battery"
-              sectionData={inputData.battery}
+              sectionData={batteryData ? batteryData.subType : []}
               handleInputChange={handleInputChange}
               handleDeleteInput={handleDeleteInput}
               handleAddInput={handleAddInput}
@@ -971,7 +980,7 @@ const priceData = getDataByType(data, 'price');
           {step === 14 && (
             <StepFormSection
               sectionName="color"
-              sectionData={inputData.color}
+              sectionData={colorData ? colorData.subType : []}
               handleInputChange={handleInputChange}
               handleDeleteInput={handleDeleteInput}
               handleAddInput={handleAddInput}
@@ -980,7 +989,7 @@ const priceData = getDataByType(data, 'price');
           {step === 15 && (
             <StepFormSection
               sectionName="price"
-              sectionData={inputData.price}
+              sectionData={priceData ? priceData.subType : []}
               handleInputChange={handleInputChange}
               handleDeleteInput={handleDeleteInput}
               handleAddInput={handleAddInput}
@@ -988,59 +997,57 @@ const priceData = getDataByType(data, 'price');
           )}
           {step === 16 && (
             <div className="w-full">
-              <p className="text-center mt-3 mb-6 text-2xl">
-                Set Photo Gallery
-              </p>
+              <p className="text-center mt-3 mb-6 text-2xl">Set Photo Gallery</p>
 
               <div className="flex flex-wrap gap-3">
-                <div className="flex flex-wrap gap-3">
-                  {photoGallery.map((photo, index) => (
-                    <div className="flex" key={index}>
-                      {!photo && (
-                        <input
-                          type="file"
-                          accept="image/*"
-                          className="appearance-none max-w-[200px] w-full h-[300px] cursor-pointer relative after:absolute after:max-w-[200px] after:w-full after:h-[300px] after:bg-slate-200 after:top-0 after:left-0 after:right-0 after:bottom-0 after:border-dashed after:border-[2px] after:px-2 after:rounded-lg after:border-black"
-                          onChange={(e) => handlePhotoChange(e, index)}
-                        />
-                      )}
-                      {photo && (
-                        <div>
-                          <div className="relative max-w-[200px] w-full h-[300px] bg-slate-100 border-dashed border-[2px] border-black p-2 rounded-lg">
-                            <img
-                              src={URL.createObjectURL(photo)}
-                              alt={`Preview ${index + 1}`}
-                              className="m-0 max-w-[200px] w-full h-[280px] object-contain"
-                            />
-                            <button
-                              type="button"
-                              className="absolute top-[-12px] right-[-8px]"
-                              onClick={() => handleDeletePhoto(index)}
+                {photoGallery.map((photo, index) => (
+                  <div className="flex" key={index}>
+                    {!photo && (
+                      <input
+                        type="file"
+                        accept="image/*"
+                        className="appearance-none max-w-[200px] w-full h-[300px] cursor-pointer relative after:absolute after:max-w-[200px] after:w-full after:h-[300px] after:bg-slate-200 after:top-0 after:left-0 after:right-0 after:bottom-0 after:border-dashed after:border-[2px] after:px-2 after:rounded-lg after:border-black"
+                        onChange={(e) => handlePhotoChange(e, index)}
+                      />
+                    )}
+                    {photo && (
+                      <div>
+                        <div className="relative max-w-[200px] w-full h-[300px] bg-slate-100 border-dashed border-[2px] border-black p-2 rounded-lg">
+                          <img
+                            src={typeof photo === 'string' ? photo : URL.createObjectURL(photo)}
+                            alt={`Preview ${index + 1}`}
+                            className="m-0 max-w-[200px] w-full h-[280px] object-contain"
+                          />
+                          <button
+                            type="button"
+                            className="absolute top-[-12px] right-[-8px]"
+                            onClick={() => handleDeletePhoto(index)}
+                          >
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              viewBox="0 0 24 24"
+                              width="24"
+                              height="24"
+                              fill="rgba(0,0,0,1)"
                             >
-                              <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                viewBox="0 0 24 24"
-                                width="24"
-                                height="24"
-                                fill="rgba(0,0,0,1)"
-                              >
-                                <path d="M12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12C22 17.5228 17.5228 22 12 22ZM12 10.5858L9.17157 7.75736L7.75736 9.17157L10.5858 12L7.75736 14.8284L9.17157 16.2426L12 13.4142L14.8284 16.2426L16.2426 14.8284L13.4142 12L16.2426 9.17157L14.8284 7.75736L12 10.5858Z"></path>
-                              </svg>
-                            </button>
-                          </div>
+                              <path d="M12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12C22 17.5228 17.5228 22 12 22ZM12 10.5858L9.17157 7.75736L7.75736 9.17157L10.5858 12L7.75736 14.8284L9.17157 16.2426L12 13.4142L14.8284 16.2426L16.2426 14.8284L13.4142 12L16.2426 9.17157L14.8284 7.75736L12 10.5858Z"></path>
+                            </svg>
+                          </button>
                         </div>
-                      )}
-                    </div>
-                  ))}
-                </div>
-                <button
-                  type="button"
-                  className="max-w-[200px] w-full h-[300px] bg-slate-200 rounded-lg "
-                  onClick={handleAddPhotoInput}
-                >
-                  Add Photo
-                </button>
+                      </div>
+                    )}
+                  </div>
+                ))}
               </div>
+
+              <button
+                type="button"
+                className="max-w-[200px] w-full h-[300px] bg-slate-200 rounded-lg"
+                onClick={handleAddPhotoInput}
+              >
+                Add Photo
+              </button>
+
               {photoGallery.some((photo) => photo) && (
                 <button
                   type="button"
