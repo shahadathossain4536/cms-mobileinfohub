@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import { Link } from 'react-router-dom';
 
 const AllDeviceList = () => {
   // State to hold the fetched data
@@ -59,7 +60,7 @@ const AllDeviceList = () => {
         </div>
             <div className='w-[20%]'>{device.brand}</div>
         <div className='w-[10%]'>
-          <button className='h-10 w-20 bg-green-500 text-white cursor-pointer' onClick={()=>handleDeviceEdit(device._id)}>Edit</button>
+          <Link to={`/dashboard/update-device/${device._id}`} className='h-10 w-20 bg-green-500 text-white cursor-pointer' onClick={()=>handleDeviceEdit(device._id)}>Edit</Link>
         </div>
         <div className='w-[10%]'>
           <button className='h-10 w-20 bg-red-500 text-white cursor-pointer' onClick={()=>handleDeviceDelete(device._id)}>Delete</button>

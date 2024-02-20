@@ -1,19 +1,40 @@
-import axios from "axios";
 import React, { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+import axios from "axios";
 import { useForm } from "react-hook-form";
-import Select from "react-select";
+import toast from "react-hot-toast";
 import StepFormSection from "../../component/StepFormSection/StepFormSection";
+import Select from "react-select";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import toast from "react-hot-toast";
-
-const AddDevices = () => {
+const UpdateDevice = () => {
+  const { id } = useParams();
   const token = window.localStorage.getItem("token");
   const {
     register,
     formState: { errors },
     handleSubmit,
   } = useForm();
+  useEffect(() => {
+    console.log("Fetching data for id:", id);
+
+    const fetchData = async () => {
+      try {
+        const response = await axios.get(
+          `http://localhost:2000/api/devicesData/${id}`
+        );
+        const data = response.data;
+        console.log("Response data:", data);
+
+        setDeviceDataOnly(data);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+
+    fetchData();
+  }, [id]);
+  const [deviceDataOnly, setDeviceDataOnly] = useState(null);
   const [isClearable, setIsClearable] = useState(true);
   const [isSearchable, setIsSearchable] = useState(true);
   const [isDisabled, setIsDisabled] = useState(false);
@@ -21,9 +42,11 @@ const AddDevices = () => {
   const [isRtl, setIsRtl] = useState(false);
   const [selectedOption, setSelectedOption] = useState(null);
   const [brandOption, setBrandOption] = useState([]);
+  console.log("selectedOption", selectedOption);
   const [selectedImage, setSelectedImage] = useState(null);
   const [step, setStep] = useState(1);
-  const [imagePreviewUrl, setImagePreviewUrl] = useState(null);
+  const [imagePreviewUrl, setImagePreviewUrl] = useState();
+  console.log("imagePreviewUrl", deviceDataOnly?.banner_img);
   const [photoGallery, setPhotoGallery] = useState([null]);
   const [startDate, setStartDate] = useState(null);
   const [expandableStorageOption, setExpandableStorageOption] = useState("no");
@@ -37,6 +60,50 @@ const AddDevices = () => {
   const [frontCameraNumber, setFrontCameraNumber] = useState();
   const [showFormSection, setShowFormSection] = useState(false);
   const [isUploadSuccessful, setIsUploadSuccessful] = useState(false);
+
+  useEffect(() => {
+    const matchedOption = brandOption.find(
+      (option) => option.label === deviceDataOnly?.brand
+    );
+
+    if (matchedOption) {
+      setSelectedOption(matchedOption);
+      console.log("matchedOptionmatchedOption", matchedOption);
+    }
+    // Set the banner_img for image preview
+    if (deviceDataOnly && deviceDataOnly.banner_img) {
+      setImagePreviewUrl(deviceDataOnly.banner_img);
+    }
+    if (deviceDataOnly && deviceDataOnly.expandable_storage) {
+        setExpandableStorageOption(deviceDataOnly.expandable_storage);
+    }
+    if (deviceDataOnly && deviceDataOnly.expandable_storage_type) {
+        setExpandableStorageType(deviceDataOnly.expandable_storage_type);
+    }
+  }, [deviceDataOnly, brandOption]);
+
+
+
+  // Assuming your full data is available in deviceDataOnly
+const { data } = deviceDataOnly || {};
+
+// Find the network data
+const getDataByType = (data, targetType) => data && data.find(entry => entry.type === targetType);
+
+const networkData = getDataByType(data, 'network');
+const launchData = getDataByType(data, 'launch');
+const bodyData = getDataByType(data, 'body');
+const displayData = getDataByType(data, 'display');
+const platformData = getDataByType(data, 'platform');
+const memoryData = getDataByType(data, 'memory');
+const main_cameraData = getDataByType(data, 'main_camera');
+const selfie_cameraData = getDataByType(data, 'selfie_camera');
+const soundData = getDataByType(data, 'sound');
+const commsData = getDataByType(data, 'comms');
+const featuresData = getDataByType(data, 'features');
+const batteryData = getDataByType(data, 'battery');
+const colorData = getDataByType(data, 'color');
+const priceData = getDataByType(data, 'price');
   // Define the function to handle the Create button click
   const handleCreateButtonClick = (cameraName) => {
     console.log("cameraNamecameraName", cameraName);
@@ -96,16 +163,20 @@ const AddDevices = () => {
       // Check if an image is selected
       if (selectedImage) {
         const formData = new FormData();
-        formData.append('image', selectedImage);
+        formData.append("image", selectedImage);
 
-        const response = await axios.post('https://api.imgbb.com/1/upload', formData, {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
-          params: {
-            key: '04ece4ca20ee040e0e21680d6591ddfe', // Replace with your actual API key
-          },
-        });
+        const response = await axios.post(
+          "https://api.imgbb.com/1/upload",
+          formData,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+            params: {
+              key: "04ece4ca20ee040e0e21680d6591ddfe", // Replace with your actual API key
+            },
+          }
+        );
 
         if (response.data.status === 200) {
           // Image uploaded successfully, get the deletehash
@@ -113,31 +184,36 @@ const AddDevices = () => {
           const bannerImageRes = response.data.data.display_url;
 
           // Now you can use this deletehash to delete the image later
-          console.log('Image uploaded successfully. Deletehash:', response.data);
+          console.log(
+            "Image uploaded successfully. Deletehash:",
+            response.data
+          );
 
           // Show the delete button and store the deletehash in your component state
           setDeleteButtonVisible(true);
           setImageDeleteHash(deleteHash);
-          setBannerImage(bannerImageRes)
+          setBannerImage(bannerImageRes);
 
           // Show success toast
-          toast.success('Image uploaded successfully');
+          toast.success("Image uploaded successfully");
 
           // Set the upload status to true
           setIsUploadSuccessful(true);
         } else {
-          toast.error('Failed to upload image');
+          toast.error("Failed to upload image");
         }
       } else {
-        console.log('No image selected to upload.');
+        console.log("No image selected to upload.");
         // Show error toast if no image selected
-        toast.error('Please select an image to upload.', { duration: 4000 });
+        toast.error("Please select an image to upload.", { duration: 4000 });
       }
     } catch (error) {
-      console.error('Error uploading image to ImgBB:', error);
+      console.error("Error uploading image to ImgBB:", error);
 
       // Show error toast
-      toast.error('Error uploading image. Please try again later.', { duration: 4000 });
+      toast.error("Error uploading image. Please try again later.", {
+        duration: 4000,
+      });
       // Handle the error as needed
     }
   };
@@ -193,17 +269,20 @@ const AddDevices = () => {
     setPhotoGallery((prevGallery) => [...prevGallery, null]);
   };
   const galleryPhotoUpload = async () => {
-    const apiKey = '04ece4ca20ee040e0e21680d6591ddfe';
+    const apiKey = "04ece4ca20ee040e0e21680d6591ddfe";
     try {
       const uploadPromises = photoGallery.map(async (photo, index) => {
         if (photo) {
           const formData = new FormData();
-          formData.append('image', photo);
+          formData.append("image", photo);
 
-          const response = await fetch('https://api.imgbb.com/1/upload?key=' + apiKey, {
-            method: 'POST',
-            body: formData,
-          });
+          const response = await fetch(
+            "https://api.imgbb.com/1/upload?key=" + apiKey,
+            {
+              method: "POST",
+              body: formData,
+            }
+          );
 
           const result = await response.json();
 
@@ -212,7 +291,7 @@ const AddDevices = () => {
             setUploadedPhotoUrls((prevUrls) => [...prevUrls, result.data.url]);
           } else {
             // Photo upload failed, show an error toast
-            toast.error('Failed to upload photo');
+            toast.error("Failed to upload photo");
           }
         }
       });
@@ -221,11 +300,11 @@ const AddDevices = () => {
       await Promise.all(uploadPromises);
 
       // Show success toast after all uploads are complete
-      toast.success('All photos uploaded successfully');
+      toast.success("All photos uploaded successfully");
     } catch (error) {
       // Handle any errors during the upload process
-      console.error('Error uploading photos:', error);
-      toast.error('Error uploading photos');
+      console.error("Error uploading photos:", error);
+      toast.error("Error uploading photos");
     }
   };
   const [inputData, setInputData] = useState({
@@ -300,7 +379,10 @@ const AddDevices = () => {
     }
 
     // Use Array.from to create an array with the specified count
-    const newInputs = Array.from({ length: count }, () => ({ name: "", subData: "" }));
+    const newInputs = Array.from({ length: count }, () => ({
+      name: "",
+      subData: "",
+    }));
 
     // Insert new inputs at the beginning of the array
     updatedData[section] = [...newInputs, ...updatedData[section]];
@@ -316,12 +398,14 @@ const AddDevices = () => {
     }
 
     // Use Array.from to create an array with the specified count
-    const newInputs = Array.from({ length: count }, () => ({ name: "", subData: "" }));
+    const newInputs = Array.from({ length: count }, () => ({
+      name: "",
+      subData: "",
+    }));
 
     updatedData[section] = [...updatedData[section], ...newInputs];
     setInputData(updatedData);
   };
-
 
   const handleInputChange = (section, index, key, value) => {
     const updatedData = { ...inputData };
@@ -363,12 +447,10 @@ const AddDevices = () => {
     fetchData();
   }, []);
   const onSubmit = async (data) => {
-
-
     const devicesData = {
       brand: `${selectedOption?.label}`,
       deviceName: `${data.modelName}`,
-      release_date: startDate,
+      release_date: data.release_date,
       banner_img: bannerImage,
       galleryPhoto: uploadedPhotoUrls,
       weight: `${data.weight}`,
@@ -391,28 +473,30 @@ const AddDevices = () => {
         subType,
       })),
     };
-   
+  
     try {
-      const response = await axios.post("http://localhost:2000/api/devicesData", devicesData, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-      });
-      console.log("Device added successfully:", response.data);
+      const response = await axios.put(
+        `http://localhost:2000/api/devicesData/${id}`, // Use PUT request for updating data
+        devicesData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+      console.log('Device updated successfully:', response.data);
       // Add any further logic or redirection after successful submission
-      toast.success('Device added successfully');
+      toast.success('Device updated successfully');
     } catch (error) {
-      console.error("Error adding device:", error.response.data);
+      console.error('Error updating device:', error.response.data);
       // Handle error and display an appropriate message to the user
-      toast.error('Error adding device. Please try again later.');
+      toast.error('Error updating device. Please try again later.');
     }
   };
-
-
   return (
     <div className="max-w-[1000px] w-full border-[2px] rounded-md">
-      <h2 className="py-3 text-center text-xl">Add Device</h2>
+      <h2 className="py-3 text-center text-xl">Update Device Data</h2>
 
       <div className="w-full flex justify-center items-center">
         <form
@@ -433,8 +517,10 @@ const AddDevices = () => {
                   isLoading={isLoading}
                   isClearable={isClearable}
                   isRtl={isRtl}
+                  //   defaultValue={selectedOption[0]}
                   isSearchable={isSearchable}
                   name="color"
+                  value={selectedOption}
                   options={brandOption}
                   onChange={setSelectedOption}
                 />
@@ -469,7 +555,6 @@ const AddDevices = () => {
                     </div>
                   )}
 
-                  {console.log("isImageSelected", isImageSelected)}
                   {selectedImage && (
                     <button
                       type="button"
@@ -489,7 +574,6 @@ const AddDevices = () => {
                       image Delete
                     </button>
                   )}
-
                 </div>
               </div>
 
@@ -497,6 +581,7 @@ const AddDevices = () => {
                 <label htmlFor="">Model Name</label>
                 <input
                   className="max-w-[560px] h-12 border-[2px] border-gray-500 rounded-md outline-none px-3 w-full"
+                  defaultValue={deviceDataOnly?.deviceName}
                   type="text"
                   {...register("modelName", {
                     required: {
@@ -517,15 +602,12 @@ const AddDevices = () => {
                 <label className="block" htmlFor="">
                   Release Date
                 </label>
-                <DatePicker
-                  className="max-w-[560px] h-12 border-[2px] border-gray-500 rounded-md outline-none px-3 w-full block"
-                  selected={startDate} // Pass the selected date value
-                  onChange={(date) => setStartDate(date)} // Handle date change
-                  dateFormat="MM/dd/yyyy" // Specify date format
+                <input
+                  className="max-w-[560px] h-12 border-[2px] border-gray-500 rounded-md outline-none px-3 w-full"
+                  type="text"
+                  defaultValue={deviceDataOnly?.release_date}
+                  {...register("release_date", {})}
                 />
-                {errors.release_date && (
-                  <p className="error-message">{errors.release_date.message}</p>
-                )}
               </div>
               <div className="w-full flex gap-4">
                 <div className="w-full">
@@ -533,6 +615,7 @@ const AddDevices = () => {
                   <input
                     className="max-w-[560px] h-12 border-[2px] border-gray-500 rounded-md outline-none px-3 w-full"
                     type="text"
+                    defaultValue={deviceDataOnly?.weight}
                     {...register("weight", {})}
                   />
                 </div>
@@ -541,6 +624,7 @@ const AddDevices = () => {
                   <input
                     className="max-w-[560px] h-12 border-[2px] border-gray-500 rounded-md outline-none px-3 w-full"
                     type="text"
+                    defaultValue={deviceDataOnly?.thickness}
                     {...register("thickness", {})}
                   />
                 </div>
@@ -551,6 +635,7 @@ const AddDevices = () => {
                   <input
                     className="max-w-[560px] h-12 border-[2px] border-gray-500 rounded-md outline-none px-3 w-full"
                     type="text"
+                    defaultValue={deviceDataOnly?.os_android}
                     {...register("os_android", {})}
                   />
                 </div>
@@ -559,6 +644,7 @@ const AddDevices = () => {
                   <input
                     className="max-w-[560px] h-12 border-[2px] border-gray-500 rounded-md outline-none px-3 w-full"
                     type="text"
+                    defaultValue={deviceDataOnly?.os_brand}
                     {...register("os_brand", {})}
                   />
                 </div>
@@ -569,6 +655,7 @@ const AddDevices = () => {
                   <input
                     className="max-w-[560px] h-12 border-[2px] border-gray-500 rounded-md outline-none px-3 w-full"
                     type="text"
+                    defaultValue={deviceDataOnly?.displaySize}
                     {...register("displaySize", {})}
                   />
                 </div>
@@ -577,6 +664,7 @@ const AddDevices = () => {
                   <input
                     className="max-w-[560px] h-12 border-[2px] border-gray-500 rounded-md outline-none px-3 w-full"
                     type="text"
+                    defaultValue={deviceDataOnly?.displayResolution}
                     {...register("displayResolution", {})}
                   />
                 </div>
@@ -587,6 +675,7 @@ const AddDevices = () => {
                   <select
                     id="expandableStorage"
                     value={expandableStorageOption}
+                    defaultValue={expandableStorageOption}
                     onChange={handleExpandableStorageChange}
                     className="max-w-[560px] h-12 border-[2px] border-gray-500 rounded-md outline-none px-3 w-full"
                   >
@@ -597,10 +686,13 @@ const AddDevices = () => {
 
                 {expandableStorageOption === "yes" && (
                   <div className="w-full">
-                    <label htmlFor="expandableStorageType">Expandable Storage Type:</label>
+                    <label htmlFor="expandableStorageType">
+                      Expandable Storage Type:
+                    </label>
                     <select
                       id="expandableStorageType"
                       value={expandableStorageType}
+                      defaultChecked={expandableStorageType}
                       onChange={(e) => setExpandableStorageType(e.target.value)}
                       className="max-w-[560px] h-12 border-[2px] border-gray-500 rounded-md outline-none px-3 w-full"
                     >
@@ -617,6 +709,7 @@ const AddDevices = () => {
                   <input
                     className="max-w-[560px] h-12 border-[2px] border-gray-500 rounded-md outline-none px-3 w-full"
                     type="text"
+                    defaultValue={deviceDataOnly?.ram}
                     {...register("ram", {
                       required: {
                         value: true,
@@ -638,22 +731,14 @@ const AddDevices = () => {
                   <input
                     className="max-w-[560px] h-12 border-[2px] border-gray-500 rounded-md outline-none px-3 w-full"
                     type="text"
+                    defaultValue={deviceDataOnly?.storage}
                     {...register("storage", {
-                      required: {
-                        value: true,
-                        message: "Enter Storage value",
-                      },
                       pattern: {
                         value: /^[0-9]+$/,
                         message: "Please enter a valid number for Storage",
                       },
                     })}
                   />
-                  {errors.storage && (
-                    <span className="error-message">
-                      {errors.storage.message}
-                    </span>
-                  )}
                 </div>
               </div>
               <div className="w-full flex gap-4">
@@ -662,12 +747,9 @@ const AddDevices = () => {
                   <input
                     className="max-w-[560px] h-12 border-[2px] border-gray-500 rounded-md outline-none px-3 w-full"
                     type="text"
-                    {...register("backCamera", {
-
-
-                    })}
+                    defaultValue={deviceDataOnly?.backCamera}
+                    {...register("backCamera", {})}
                   />
-
                 </div>
 
                 <div className="w-full">
@@ -675,12 +757,9 @@ const AddDevices = () => {
                   <input
                     className="max-w-[560px] h-12 border-[2px] border-gray-500 rounded-md outline-none px-3 w-full"
                     type="text"
-                    {...register("backCameraVideo", {
-
-
-                    })}
+                    defaultValue={deviceDataOnly?.backCameraVideo}
+                    {...register("backCameraVideo", {})}
                   />
-
                 </div>
               </div>
               <div className="w-full flex gap-4">
@@ -689,12 +768,9 @@ const AddDevices = () => {
                   <input
                     className="max-w-[560px] h-12 border-[2px] border-gray-500 rounded-md outline-none px-3 w-full"
                     type="text"
-                    {...register("battery", {
-
-
-                    })}
+                    defaultValue={deviceDataOnly?.battery}
+                    {...register("battery", {})}
                   />
-
                 </div>
 
                 <div className="w-full">
@@ -702,12 +778,9 @@ const AddDevices = () => {
                   <input
                     className="max-w-[560px] h-12 border-[2px] border-gray-500 rounded-md outline-none px-3 w-full"
                     type="text"
-                    {...register("chargingSpeed", {
-
-
-                    })}
+                    defaultValue={deviceDataOnly?.chargingSpeed}
+                    {...register("chargingSpeed", {})}
                   />
-
                 </div>
               </div>
               <div className="w-full flex gap-4">
@@ -716,15 +789,10 @@ const AddDevices = () => {
                   <input
                     className="max-w-[560px] h-12 border-[2px] border-gray-500 rounded-md outline-none px-3 w-full"
                     type="text"
-                    {...register("processor", {
-
-
-                    })}
+                    defaultValue={deviceDataOnly?.processor}
+                    {...register("processor", {})}
                   />
-
                 </div>
-
-
               </div>
             </div>
           )}
@@ -732,7 +800,9 @@ const AddDevices = () => {
           {step === 2 && (
             <StepFormSection
               sectionName="network"
-              sectionData={inputData.network}
+              sectionData={networkData ? networkData.subType : []}
+            
+              
               handleInputChange={handleInputChange}
               handleDeleteInput={handleDeleteInput}
               handleAddInput={handleAddInput}
@@ -741,7 +811,7 @@ const AddDevices = () => {
           {step === 3 && (
             <StepFormSection
               sectionName="launch"
-              sectionData={inputData.launch}
+              sectionData={launchData ? launchData.subType : []}
               handleInputChange={handleInputChange}
               handleDeleteInput={handleDeleteInput}
               handleAddInput={handleAddInput}
@@ -750,7 +820,7 @@ const AddDevices = () => {
           {step === 4 && (
             <StepFormSection
               sectionName="body"
-              sectionData={inputData.body}
+              sectionData={bodyData ? bodyData.subType : []}
               handleInputChange={handleInputChange}
               handleDeleteInput={handleDeleteInput}
               handleAddInput={handleAddInput}
@@ -759,7 +829,7 @@ const AddDevices = () => {
           {step === 5 && (
             <StepFormSection
               sectionName="display"
-              sectionData={inputData.display}
+              sectionData={displayData ? displayData.subType : []}
               handleInputChange={handleInputChange}
               handleDeleteInput={handleDeleteInput}
               handleAddInput={handleAddInput}
@@ -768,7 +838,7 @@ const AddDevices = () => {
           {step === 6 && (
             <StepFormSection
               sectionName="platform"
-              sectionData={inputData.platform}
+              sectionData={platformData ? platformData.subType : []}
               handleInputChange={handleInputChange}
               handleDeleteInput={handleDeleteInput}
               handleAddInput={handleAddInput}
@@ -777,36 +847,39 @@ const AddDevices = () => {
           {step === 7 && (
             <StepFormSection
               sectionName="memory"
-              sectionData={inputData.memory}
+              sectionData={launchData ? launchData.subType : []}
               handleInputChange={handleInputChange}
               handleDeleteInput={handleDeleteInput}
               handleAddInput={handleAddInput}
             />
           )}
           {step === 8 && (
-
-            <div className='w-full'>
-              {
-                !showFormSection && <div className='flex flex-col gap-4 w-full'>
-                  <label htmlFor="back_camera_number">Enter Back Camera Number</label>
+            <div className="w-full">
+              {!showFormSection && (
+                <div className="flex flex-col gap-4 w-full">
+                  <label htmlFor="back_camera_number">
+                    Enter Back Camera Number
+                  </label>
                   <input
-                    className='h-12 border-[2px] w-full border-gray-500 rounded-md outline-none px-3 appearance-none'
+                    className="h-12 border-[2px] w-full border-gray-500 rounded-md outline-none px-3 appearance-none"
                     type="number"
                     id="back_camera_number"
                     value={backCameraNumber}
-
-                    onChange={(e) => setBackCameraNumber(Math.max(0, parseInt(e.target.value, 10)))}
+                    onChange={(e) =>
+                      setBackCameraNumber(
+                        Math.max(0, parseInt(e.target.value, 10))
+                      )
+                    }
                   />
                   <button
                     type="button"
-                    className='bg-green-500 rounded-lg w-full text-white text-xs h-12 px-1'
+                    className="bg-green-500 rounded-lg w-full text-white text-xs h-12 px-1"
                     onClick={() => handleCreateButtonClick("main_camera")}
                   >
                     Create Input
                   </button>
-
                 </div>
-              }
+              )}
 
               {showFormSection && (
                 <div>
@@ -820,24 +893,28 @@ const AddDevices = () => {
                 </div>
               )}
             </div>
-
           )}
           {step === 9 && (
-
-            <div className='w-full'>
+            <div className="w-full">
               {!showFormSection && (
-                <div className='flex flex-col gap-4 w-full'>
-                  <label htmlFor="front_camera_number">Enter Front Camera Number</label>
+                <div className="flex flex-col gap-4 w-full">
+                  <label htmlFor="front_camera_number">
+                    Enter Front Camera Number
+                  </label>
                   <input
-                    className='h-12 border-[2px] w-full border-gray-500 rounded-md outline-none px-3 appearance-none'
+                    className="h-12 border-[2px] w-full border-gray-500 rounded-md outline-none px-3 appearance-none"
                     type="number"
                     id="front_camera_number"
                     value={frontCameraNumber}
-                    onChange={(e) => setFrontCameraNumber(Math.max(0, parseInt(e.target.value, 10)))}
+                    onChange={(e) =>
+                      setFrontCameraNumber(
+                        Math.max(0, parseInt(e.target.value, 10))
+                      )
+                    }
                   />
                   <button
                     type="button"
-                    className='bg-green-500 rounded-lg w-full text-white text-xs h-12 px-1'
+                    className="bg-green-500 rounded-lg w-full text-white text-xs h-12 px-1"
                     onClick={() => handleSelfieCameraInput("selfie_camera")}
                   >
                     Create Input
@@ -854,8 +931,6 @@ const AddDevices = () => {
                 />
               )}
             </div>
-
-
           )}
           {step === 10 && (
             <StepFormSection
@@ -913,7 +988,9 @@ const AddDevices = () => {
           )}
           {step === 16 && (
             <div className="w-full">
-              <p className="text-center mt-3 mb-6 text-2xl">Set Photo Gallery</p>
+              <p className="text-center mt-3 mb-6 text-2xl">
+                Set Photo Gallery
+              </p>
 
               <div className="flex flex-wrap gap-3">
                 <div className="flex flex-wrap gap-3">
@@ -964,7 +1041,7 @@ const AddDevices = () => {
                   Add Photo
                 </button>
               </div>
-              {photoGallery.some(photo => photo) && (
+              {photoGallery.some((photo) => photo) && (
                 <button
                   type="button"
                   className="max-w-[200px] w-full h-[50px] bg-blue-500 rounded-lg"
@@ -973,12 +1050,7 @@ const AddDevices = () => {
                   Upload All Photos
                 </button>
               )}
-
             </div>
-
-
-
-
           )}
 
           {/* main data */}
@@ -995,13 +1067,12 @@ const AddDevices = () => {
             )}
             {step < 16 && (
               <button
-                type="button"  // Set the button type to "button" to prevent form submission
+                type="button" // Set the button type to "button" to prevent form submission
                 onClick={() => [setStep(step + 1), setShowFormSection(false)]}
                 className="h-12 bg-gray-500 rounded-md outline-none px-3 text-white cursor-pointer w-full"
               >
                 Next
               </button>
-
             )}
           </div>
           {step === 16 && (
@@ -1021,4 +1092,4 @@ const AddDevices = () => {
   );
 };
 
-export default AddDevices;
+export default UpdateDevice;

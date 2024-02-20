@@ -11,6 +11,7 @@ import PrivateRoute from './component/HOC/PrivateRoute';
 import { Toaster } from 'react-hot-toast';
 import AddDevicesTest from './Pages/AddDevicesTest/AddDevicesTest';
 import AllDeviceList from './Pages/AllDeviceList/AllDeviceList';
+import UpdateDevice from './Pages/UpdateDevice/UpdateDevice';
 
 function App() {
   return (
@@ -37,6 +38,7 @@ function App() {
           <Route path='add-brand-name' element={<AddBrandName />} />
           <Route path='add-device' element={<AddDevices />} />
           <Route path='all-devices-list' element={<AllDeviceList />} />
+          <Route path='update-device/:id' element={<UpdateDevice />} />
 
         </Route>
 
