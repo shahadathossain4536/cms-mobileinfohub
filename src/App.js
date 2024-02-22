@@ -12,6 +12,7 @@ import { Toaster } from 'react-hot-toast';
 import AddDevicesTest from './Pages/AddDevicesTest/AddDevicesTest';
 import AllDeviceList from './Pages/AllDeviceList/AllDeviceList';
 import UpdateDevice from './Pages/UpdateDevice/UpdateDevice';
+import AllBrandList from './Pages/AllBrandList/AllBrandList';
 
 function App() {
   return (
@@ -38,6 +39,7 @@ function App() {
           <Route path='add-brand-name' element={<AddBrandName />} />
           <Route path='add-device' element={<AddDevices />} />
           <Route path='all-devices-list' element={<AllDeviceList />} />
+          <Route path='all-brand-list' element={<AllBrandList />} />
           <Route path='update-device/:id' element={<UpdateDevice />} />
 
         </Route>
