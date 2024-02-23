@@ -13,6 +13,7 @@ import AddDevicesTest from './Pages/AddDevicesTest/AddDevicesTest';
 import AllDeviceList from './Pages/AllDeviceList/AllDeviceList';
 import UpdateDevice from './Pages/UpdateDevice/UpdateDevice';
 import AllBrandList from './Pages/AllBrandList/AllBrandList';
+import Advertisement from './Pages/Advertisement/Advertisement';
 
 function App() {
   return (
@@ -41,6 +42,7 @@ function App() {
           <Route path='all-devices-list' element={<AllDeviceList />} />
           <Route path='all-brand-list' element={<AllBrandList />} />
           <Route path='update-device/:id' element={<UpdateDevice />} />
+          <Route path='advertisement' element={<Advertisement />} />
 
         </Route>
 
