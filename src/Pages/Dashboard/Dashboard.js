@@ -18,7 +18,7 @@ const Dashboard = () => {
           <Link className={`w-full h-10 ${pathname === '/dashboard/all-brand-list' && 'bg-slate-200'}   rounded-md flex justify-center items-center my-2`} to='/dashboard/all-brand-list'>All Brand List</Link>
           <Link className={`w-full h-10 ${pathname === '/dashboard/advertisement' && 'bg-slate-200'}   rounded-md flex justify-center items-center my-2`} to='/dashboard/advertisement'>Advertisement</Link>
         </div>
-        <div className='w-full py-2 px-4 flex justify-center items-center'>
+        <div className='w-full py-2 px-4 flex justify-start items-start'>
           <Outlet/>
         </div>
       </div>
