@@ -25,7 +25,7 @@ const AddDevices = () => {
   const [step, setStep] = useState(1);
   const [imagePreviewUrl, setImagePreviewUrl] = useState(null);
   const [photoGallery, setPhotoGallery] = useState([null]);
-  console.log("photoGallery",photoGallery);
+  console.log("photoGallery", photoGallery);
   const [startDate, setStartDate] = useState(null);
   const [expandableStorageOption, setExpandableStorageOption] = useState("no");
   const [isImageSelected, setIsImageSelected] = useState(false);
@@ -369,7 +369,8 @@ const AddDevices = () => {
     const devicesData = {
       brand: `${selectedOption?.label}`,
       deviceName: `${data.modelName}`,
-      release_date: startDate,
+      release_date: data.release_date,
+      status:data.status,
       banner_img: bannerImage,
       galleryPhoto: uploadedPhotoUrls,
       weight: `${data.weight}`,
@@ -384,7 +385,7 @@ const AddDevices = () => {
       displaySize: `${data.displaySize}`,
       displayResolution: `${data.displayResolution}`,
       expandable_storage: expandableStorageOption,
-      expandable_storage_type: `${data.expandable_storage_type}`,
+      expandable_storage_type: expandableStorageType,
       ram: `${data.ram}`,
       storage: `${data.storage}`,
       data: Object.entries(inputData).map(([type, subType]) => ({
@@ -392,7 +393,7 @@ const AddDevices = () => {
         subType,
       })),
     };
-
+console.log("devicesData", devicesData);
     try {
       const response = await axios.post("http://localhost:2000/api/devicesData", devicesData, {
         headers: {
@@ -518,14 +519,27 @@ const AddDevices = () => {
                 <label className="block" htmlFor="">
                   Release Date
                 </label>
-                <DatePicker
-                  className="max-w-[560px] h-12 border-[2px] border-gray-500 rounded-md outline-none px-3 w-full block"
-                  selected={startDate} // Pass the selected date value
-                  onChange={(date) => setStartDate(date)} // Handle date change
-                  dateFormat="MM/dd/yyyy" // Specify date format
+                <input
+                  className="max-w-[560px] h-12 border-[2px] border-gray-500 rounded-md outline-none px-3 w-full"
+                  type="text"
+                  {...register("release_date", {})}
                 />
                 {errors.release_date && (
                   <p className="error-message">{errors.release_date.message}</p>
+                )}
+              </div>
+              <div className="w-full">
+                <label htmlFor="status">Status</label>
+                <select
+                  {...register('status')}
+                  className="max-w-[560px] h-12 border-[2px] border-gray-500 rounded-md outline-none px-3 w-full"
+                >
+                  <option value="">Select Status Option</option>
+                  <option selected value="Available">Available</option>
+                  <option value="Coming soon">Coming soon</option>
+                </select>
+                {errors.status && (
+                  <p className="error-message">{errors.status.message}</p>
                 )}
               </div>
               <div className="w-full flex gap-4">

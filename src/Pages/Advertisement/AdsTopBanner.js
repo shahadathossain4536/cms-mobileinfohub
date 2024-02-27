@@ -14,8 +14,8 @@ const AdsTopBanner = () => {
   const [selectedOption, setSelectedOption] = useState("photo");
   const [sliderPhotos, setSliderPhotos] = useState([null]);
   const [isPhotoUpdated, setIsPhotoUpdated] = useState(false);
-
-
+  const bannerOption = selectedOption;
+  console.log("setSelectedOption", selectedOption);
   const addPhotoInput = () => {
     if (sliderPhotos.length < 4) {
       setSliderPhotos([...sliderPhotos, null]);
@@ -49,7 +49,7 @@ const AdsTopBanner = () => {
     setValue(inputName, null);
   };
 
-  
+
   const handleOptionChange = (event) => {
     setSelectedOption(event.target.value);
     setIsPhotoUpdated(false);
@@ -65,11 +65,11 @@ const AdsTopBanner = () => {
     try {
       const response = await axios.post("https://api.imgbb.com/1/upload", formData);
       console.log("ssssssssssssssssssssss", response);
-      if(response.data.success){
+      if (response.data.success) {
         toast.success("Images uploaded successfully!");
       }
       return response.data.data.url;
-      
+
     } catch (error) {
       toast.error("Error uploading images");
       console.error("Error uploading image to ImageBB:", error);
@@ -90,21 +90,44 @@ const AdsTopBanner = () => {
         const updatedPhotoLinks = await Promise.all(
           sliderPhotos.map(async (photo, index) => {
             if (photo) {
+
               const file = await fetch(photo).then((res) => res.blob());
               const imageLink = await uploadImageToImageBB(file);
+              console.log("imageLink", imageLink);
               return imageLink;
             }
             return null;
           })
         );
 
-        // Save the image links in the state or perform further actions
-        console.log("Image Links:", updatedPhotoLinks);
+        // Make the POST request to your server with the collected data
+        try {
+          console.log("updatedPhotoLinks", updatedPhotoLinks);
+          const data = {
+
+            bannerOption,
+            bannerItem: [...updatedPhotoLinks],
+          }
+          const response = await axios.post("http://localhost:2000/api/create-ads/topAds", data);
+
+          // Handle success
+          console.log("Server response:", response.data);
+          toast.success("Top ads created successfully!");
+
+          // Optionally, reset your form or perform other actions after successful submission
+          // reset(); // Assuming you have a reset function from react-hook-form
+
+        } catch (error) {
+          // Handle error
+          console.error("Error creating top ads:", error);
+          toast.error("Error creating top ads");
+        }
         break;
       default:
         break;
     }
   };
+
 
 
   return (
@@ -138,10 +161,10 @@ const AdsTopBanner = () => {
                   required: "Please select an image",
                 })}
 
-                // onChange={(e) => {
-                //   setSelectedImage(e.target.files[0]);
-                //   previewImage(e.target.files[0]);
-                // }}
+              // onChange={(e) => {
+              //   setSelectedImage(e.target.files[0]);
+              //   previewImage(e.target.files[0]);
+              // }}
               />
             </div>
           )}
