@@ -5,12 +5,12 @@ import { useQuery, useMutation, queryCache, useQueryClient } from 'react-query';
 import { Link } from 'react-router-dom';
 
 const fetchData = async () => {
-  const response = await axios.get('http://localhost:2000/api/brandName');
+  const response = await axios.get('https://mobile-project-server.onrender.com/api/brandName');
   return response.data.brandNames;
 };
 
 const deleteBrand = async (id) => {
-  await axios.delete(`http://localhost:2000/api/brandName/${id}`);
+  await axios.delete(`https://mobile-project-server.onrender.com/api/brandName/${id}`);
 };
 
 const AllBrandList = () => {

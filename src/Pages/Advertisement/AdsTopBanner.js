@@ -108,7 +108,7 @@ const AdsTopBanner = () => {
             bannerOption,
             bannerItem: [...updatedPhotoLinks],
           }
-          const response = await axios.post("http://localhost:2000/api/create-ads/topAds", data);
+          const response = await axios.post("https://mobile-project-server.onrender.com/api/create-ads/topAds", data);
 
           // Handle success
           console.log("Server response:", response.data);

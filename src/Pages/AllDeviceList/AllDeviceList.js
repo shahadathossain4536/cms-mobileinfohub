@@ -11,7 +11,7 @@ const AllDeviceList = () => {
     const fetchData = async () => {
       try {
         // Make a GET request using Axios
-        const response = await axios.get('http://localhost:2000/api/devicesData');
+        const response = await axios.get('https://mobile-project-server.onrender.com/api/devicesData');
 
         // Set the fetched data to the state
         setAllDeviceData(response.data);
