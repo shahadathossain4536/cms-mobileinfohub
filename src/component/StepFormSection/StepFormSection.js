@@ -28,7 +28,7 @@
 //       </div>
 //       <div className='w-full mt-4'>
 //         <button
-//         type="button" 
+//         type="button"
 //           className='max-w-[560px] h-12 bg-gray-500 rounded-md outline-none px-3 text-white cursor-pointer w-full'
 //           onClick={() => handleAddInput(sectionName)}
 //         >

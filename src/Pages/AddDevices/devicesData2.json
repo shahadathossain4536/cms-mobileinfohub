@@ -1,0 +1,237 @@
+{
+  "brand": "samsung",
+  "deviceName": "Samsung Galaxy A06",
+  "release_date": "2024, August 22",
+  "status": "Available",
+  "banner_img": "https://i.ibb.co/jzfvYsn/samsung-galaxy-a06-1.jpg",
+  "galleryPhoto": [
+    "https://i.ibb.co/DtSFCWV/samsung-galaxy-a06-11.jpg"
+  ],
+  "weight": "189g",
+  "backCamera": "50MP",
+  "backCameraVideo": "1080p@30fps",
+  "battery": "5000",
+  "chargingSpeed": "25",
+  "processor": "Mediatek Helio G85",
+  "thickness": "8mm",
+  "os_android": "Android 14, up to 2 major Android upgrades",
+  "os_brand": "",
+  "displaySize": "6.7",
+  "displayResolution": "720x1600",
+  "expandable_storage": "Yes",
+  "expandable_storage_type": "microSDXC",
+  "ram": "4/6GB",
+  "storage": "64GB/128GB",
+  "data": [
+    {
+      "type": "network",
+      "subType": [
+        {
+          "name": "Technology",
+          "subData": "GSM / HSPA / LTE"
+        }
+      ]
+    },
+    {
+      "type": "launch",
+      "subType": [
+        {
+          "name": "Announced",
+          "subData": "2024, August 16"
+        },
+        {
+          "name": "Status",
+          "subData": "Available. Released 2024, August 22"
+        }
+      ]
+    },
+    {
+      "type": "body",
+      "subType": [
+        {
+          "name": "Dimensions",
+          "subData": "167.3 x 77.3 x 8 mm (6.59 x 3.04 x 0.31 in)"
+        },
+        {
+          "name": "Weight",
+          "subData": "189 g (6.67 oz)"
+        },
+        {
+          "name": "Build",
+          "subData": "Glass front, plastic back, plastic frame"
+        },
+        {
+          "name": "SIM",
+          "subData": "Single SIM (Nano-SIM) or Dual SIM (Nano-SIM, dual stand-by)"
+        }
+      ]
+    },
+    {
+      "type": "display",
+      "subType": [
+        {
+          "name": "Type",
+          "subData": "IPS LCD"
+        },
+        {
+          "name": "Size",
+          "subData": "6.7 inches, 108.4 cm2 (~83.8% screen-to-body ratio)"
+        },
+        {
+          "name": "Resolution",
+          "subData": "720 x 1600 pixels, 20:9 ratio (~262 ppi density)"
+        }
+      ]
+    },
+    {
+      "type": "platform",
+      "subType": [
+        {
+          "name": "OS",
+          "subData": "Android 14, up to 2 major Android upgrades"
+        },
+        {
+          "name": "Chipset",
+          "subData": "Mediatek Helio G85 (12 nm)"
+        },
+        {
+          "name": "CPU",
+          "subData": "Octa-core (2x2.0 GHz Cortex-A75 & 6x1.8 GHz Cortex-A55)"
+        },
+        {
+          "name": "GPU",
+          "subData": "Mali-G52 MC2"
+        }
+      ]
+    },
+    {
+      "type": "memory",
+      "subType": [
+        {
+          "name": "Card Slot",
+          "subData": "microSDXC (dedicated slot)"
+        },
+        {
+          "name": "Internal",
+          "subData": "64GB 4GB RAM, 128GB 6GB RAM"
+        },
+        {
+          "name": "",
+          "subData": "eMMC 5.1"
+        }
+      ]
+    },
+    {
+      "type": "main_camera",
+      "subType": [
+        {
+          "name": "",
+          "subData": "50 MP, f/1.8, (wide), AF"
+        },
+        {
+          "name": "",
+          "subData": "2 MP, f/2.4, (depth)"
+        },
+        {
+          "name": "Features",
+          "subData": "LED flash"
+        },
+        {
+          "name": "Video",
+          "subData": "1080p@30/60fps"
+        }
+      ]
+    },
+    {
+      "type": "selfie_camera",
+      "subType": [
+        {
+          "name": "",
+          "subData": "8 MP, f/2.0"
+        }
+      ]
+    },
+    {
+      "type": "sound",
+      "subType": [
+        {
+          "name": "Loudspeaker",
+          "subData": "Yes"
+        },
+        {
+          "name": "3.5mm jack",
+          "subData": "Yes"
+        }
+      ]
+    },
+    {
+      "type": "comms",
+      "subType": [
+        {
+          "name": "WLAN",
+          "subData": "Wi-Fi 802.11 a/b/g/n/ac, dual-band, Wi-Fi Direct"
+        },
+        {
+          "name": "Bluetooth",
+          "subData": "5.3, A2DP, LE"
+        },
+        {
+          "name": "Positioning",
+          "subData": "GPS, GLONASS, GALILEO, BDS"
+        },
+        {
+          "name": "NFC",
+          "subData": "No"
+        },
+        {
+          "name": "Radio",
+          "subData": "Unspecified"
+        },
+        {
+          "name": "USB",
+          "subData": "USB Type-C 2.0"
+        }
+      ]
+    },
+    {
+      "type": "features",
+      "subType": [
+        {
+          "name": "Sensors",
+          "subData": "Fingerprint (side-mounted), accelerometer, proximity, compass"
+        }
+      ]
+    },
+    {
+      "type": "battery",
+      "subType": [
+        {
+          "name": "Type",
+          "subData": "Li-Po 5000 mAh, non-removable"
+        },
+        {
+          "name": "Charging",
+          "subData": "25W wired"
+        }
+      ]
+    },
+    {
+      "type": "color",
+      "subType": [
+        {
+          "name": "Color",
+          "subData": "Lite Gold, White"
+        }
+      ]
+    },
+    {
+      "type": "price",
+      "subType": [
+        {
+          "name": "Price",
+          "subData": "15000"
+        }
+      ]
+    }
+  ]
+}

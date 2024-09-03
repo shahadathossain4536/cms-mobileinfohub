@@ -1,0 +1,303 @@
+{
+  "brand": "samsung",
+  "deviceName": "Samsung Galaxy S24+",
+  "release_date": "2024, January 24",
+  "status": "Available",
+  "banner_img": "https://i.ibb.co/2kzGqw5/samsung-galaxy-s24-plus-5g-sm-s926.jpg",
+  "galleryPhoto": [
+    "https://i.ibb.co/HV9skTG/samsung-galaxy-s24-plus-5g-sm-s926-2.jpg",
+    "https://i.ibb.co/47q9dhH/samsung-galaxy-s24-plus-5g-sm-s926-3.jpg",
+    "https://i.ibb.co/HFLM1rX/samsung-galaxy-s24-plus-5g-sm-s926-1.jpg"
+  ],
+  "weight": "196g ",
+  "backCamera": "50",
+  "backCameraVideo": "4320",
+  "battery": "4900",
+  "chargingSpeed": "45",
+  "processor": "Snapdragon 8 Gen 3",
+  "thickness": "7.7mm",
+  "os_android": "Android 14, up to 7 major upgrades",
+  "os_brand": "",
+  "displaySize": "6.7",
+  "displayResolution": "1440x3120",
+  "expandable_storage": "no",
+  "expandable_storage_type": "",
+  "ram": "12GB",
+  "storage": "256GB/512GB",
+  "data": [
+    {
+      "type": "network",
+      "subType": [
+        {
+          "name": "Technology",
+          "subData": "GSM / CDMA / HSPA / EVDO / LTE / 5G"
+        }
+      ]
+    },
+    {
+      "type": "launch",
+      "subType": [
+        {
+          "name": "Announced",
+          "subData": "2024, January 17"
+        },
+        {
+          "name": "Status",
+          "subData": "Available. Released 2024, January 24"
+        }
+      ]
+    },
+    {
+      "type": "body",
+      "subType": [
+        {
+          "name": "Dimensions",
+          "subData": "158.5 x 75.9 x 7.7 mm (6.24 x 2.99 x 0.30 in)"
+        },
+        {
+          "name": "Weight",
+          "subData": "196 g or 197 g (6.91 oz)"
+        },
+        {
+          "name": "Build",
+          "subData": "Glass front (Gorilla Glass Victus 2), glass back (Gorilla Glass Victus 2), aluminum frame"
+        },
+        {
+          "name": "SIM",
+          "subData": "Nano-SIM and eSIM/ Dual eSIM or Dual SIM (2 Nano-SIMs and eSIM, dual stand-by)"
+        },
+        {
+          "name": "IP Status",
+          "subData": "IP68 dust/water resistant (up to 1.5m for 30 min)"
+        },
+        {
+          "name": "",
+          "subData": "Armor aluminum 2 frame with tougher drop and scratch resistance (advertised)"
+        }
+      ]
+    },
+    {
+      "type": "display",
+      "subType": [
+        {
+          "name": "Type",
+          "subData": "Dynamic LTPO AMOLED 2X, 120Hz, HDR10+, 2600 nits (peak)"
+        },
+        {
+          "name": "Size",
+          "subData": "6.7 inches, 110.2 cm2 (~91.6% screen-to-body ratio)"
+        },
+        {
+          "name": "Resolution",
+          "subData": "1440 x 3120 pixels, 19.5:9 ratio (~513 ppi density)"
+        },
+        {
+          "name": "Protection",
+          "subData": "Corning Gorilla Glass Victus 2"
+        },
+        {
+          "name": "",
+          "subData": "Always-on display"
+        }
+      ]
+    },
+    {
+      "type": "platform",
+      "subType": [
+        {
+          "name": "OS",
+          "subData": "Android 14, up to 7 major Android upgrades, One UI 6.1"
+        },
+        {
+          "name": "Chipset",
+          "subData": "Qualcomm SM8650-AC Snapdragon 8 Gen 3 (4 nm) - USA/Canada/China Exynos 2400 (4 nm) - International"
+        },
+        {
+          "name": "CPU",
+          "subData": "8-core (1x3.39GHz Cortex-X4 & 3x3.1GHz Cortex-A720 & 2x2.9GHz Cortex-A720 & 2x2.2GHz Cortex-A520)"
+        },
+        {
+          "name": "",
+          "subData": "10-core (1x3.2GHz Cortex-X4 & 2x2.9GHz Cortex-A720 & 3x2.6GHz Cortex-A720 & 4x1.95GHz Cortex-A520)"
+        },
+        {
+          "name": "GPU",
+          "subData": "Adreno 750 (1 GHz) - USA/Canada/China"
+        },
+        {
+          "name": "",
+          "subData": "Xclipse 940 - International"
+        }
+      ]
+    },
+    {
+      "type": "memory",
+      "subType": [
+        {
+          "name": "Card Slot",
+          "subData": "No"
+        },
+        {
+          "name": "Internal",
+          "subData": "256GB 12GB RAM, 512GB 12GB RAM"
+        },
+        {
+          "name": "",
+          "subData": "UFS 4.0"
+        }
+      ]
+    },
+    {
+      "type": "main_camera",
+      "subType": [
+        {
+          "name": "",
+          "subData": "50 MP, f/1.8, 24mm (wide), 1/1.56\", 1.0µm, dual pixel PDAF, OIS"
+        },
+        {
+          "name": "",
+          "subData": "10 MP, f/2.4, 67mm (telephoto), 1/3.94\", 1.0µm, PDAF, OIS, 3x optical zoom"
+        },
+        {
+          "name": "",
+          "subData": "12 MP, f/2.2, 13mm, 120˚ (ultrawide), 1/2.55\" 1.4µm, Super Steady video"
+        },
+        {
+          "name": "Features",
+          "subData": "LED flash, auto-HDR, panorama"
+        },
+        {
+          "name": "Video",
+          "subData": "8K@24/30fps, 4K@30/60fps, 1080p@30/60/240fps, HDR10+, stereo sound rec., gyro-EIS"
+        }
+      ]
+    },
+    {
+      "type": "selfie_camera",
+      "subType": [
+        {
+          "name": "",
+          "subData": "12 MP, f/2.2, 26mm (wide), dual pixel PDAF"
+        },
+        {
+          "name": "Features",
+          "subData": "Dual video call, Auto-HDR, HDR10+"
+        },
+        {
+          "name": "Video",
+          "subData": "4K@30/60fps, 1080p@30fps"
+        }
+      ]
+    },
+    {
+      "type": "sound",
+      "subType": [
+        {
+          "name": "Loudspeaker",
+          "subData": "Yes, with stereo speakers"
+        },
+        {
+          "name": "3.5mm jack",
+          "subData": "No"
+        },
+        {
+          "name": "",
+          "subData": "32-bit/384kHz audio"
+        },
+        {
+          "name": "",
+          "subData": "Tuned by AKG"
+        }
+      ]
+    },
+    {
+      "type": "comms",
+      "subType": [
+        {
+          "name": "WLAN",
+          "subData": "Wi-Fi 802.11 a/b/g/n/ac/6e, tri-band, Wi-Fi Direct"
+        },
+        {
+          "name": "Bluetooth",
+          "subData": "5.3, A2DP, LE"
+        },
+        {
+          "name": "Positioning",
+          "subData": "GPS, GLONASS, BDS, GALILEO, QZSS"
+        },
+        {
+          "name": "NFC",
+          "subData": "Yes"
+        },
+        {
+          "name": "Radio",
+          "subData": "No"
+        },
+        {
+          "name": "USB",
+          "subData": "USB Type-C 3.2, DisplayPort 1.2, OTG"
+        }
+      ]
+    },
+    {
+      "type": "features",
+      "subType": [
+        {
+          "name": "Sensors",
+          "subData": "Fingerprint (under display, ultrasonic), accelerometer, gyro, proximity, compass, barometer"
+        },
+        {
+          "name": "",
+          "subData": "Samsung DeX, Samsung Wireless DeX (desktop experience support)"
+        },
+        {
+          "name": "",
+          "subData": "Samsung DeX, Samsung Wireless DeX (desktop experience support)"
+        },
+        {
+          "name": "",
+          "subData": "Circle to Search"
+        }
+      ]
+    },
+    {
+      "type": "battery",
+      "subType": [
+        {
+          "name": "Type",
+          "subData": "Li-Ion 4900 mAh, non-removable"
+        },
+        {
+          "name": "Wired Charging",
+          "subData": "45W wired, PD3.0, 65% in 30 min (advertised)"
+        },
+        {
+          "name": "Wire Less Charging",
+          "subData": "15W wireless (Qi/PMA)"
+        },
+        {
+          "name": "Reverse Charging",
+          "subData": "4.5W reverse wireless"
+        }
+      ]
+    },
+    {
+      "type": "color",
+      "subType": [
+        {
+          "name": "Color",
+          "subData": "Onyx Black, Marble Grey, Cobalt Violet, Amber Yellow, Jade Green, Sandstone Orange, Sapphire Blue"
+        }
+      ]
+    },
+    {
+      "type": "price",
+      "subType": [
+        {
+          "name": "Price",
+          "subData": "12GB+256GB- 90,000BDT"
+        }
+      ]
+    }
+  ]
+}

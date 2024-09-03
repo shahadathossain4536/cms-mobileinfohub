@@ -6,6 +6,7 @@ import StepFormSection from "../../component/StepFormSection/StepFormSection";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import toast from "react-hot-toast";
+import CustomModal from '../../component/CustomModal/CustomModal';
 
 const AddDevices = () => {
   const token = window.localStorage.getItem("token");
@@ -13,6 +14,7 @@ const AddDevices = () => {
     register,
     formState: { errors },
     handleSubmit,
+    reset, // Import reset here
   } = useForm();
   const [isClearable, setIsClearable] = useState(true);
   const [isSearchable, setIsSearchable] = useState(true);
@@ -38,6 +40,44 @@ const AddDevices = () => {
   const [frontCameraNumber, setFrontCameraNumber] = useState();
   const [showFormSection, setShowFormSection] = useState(false);
   const [isUploadSuccessful, setIsUploadSuccessful] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [jsonFile, setJsonFile] = useState(null);
+  const steps = [
+    "Banner Data",
+    "Network",
+    "Launch",
+    "Body",
+    "Display",
+    "Platform",
+    "Memory",
+    "Main Camera",
+    "Selfie Camera",
+    "Sound",
+    "Comms",
+    "Features",
+    "Battery",
+    "Color",
+    "Price",
+    "Photo Gallery",
+  ];
+
+  const openModal = () => {
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+  };
+
+  const handleJsonFileChange = (e) => {
+    const file = e.target.files[0];
+    setJsonFile(file);
+  };
+
+
+
+
+
   // Define the function to handle the Create button click
   const handleCreateButtonClick = (cameraName) => {
     console.log("cameraNamecameraName", cameraName);
@@ -146,41 +186,41 @@ const AddDevices = () => {
   const handleDeleteButtonClick = async (deleteUrl) => {
     console.log("deleteUrl-------------", deleteUrl);
 
-    // try {
-    //   // Extract delete hash from the delete URL
-    //   const deleteHash = deleteUrl.split('/').pop();
-    //   console.log("deleteHash-------------", deleteHash);
+    try {
+      // Extract delete hash from the delete URL
+      const deleteHash = deleteUrl.split('/').pop();
+      console.log("deleteHash-------------", deleteHash);
 
-    //   const apiKey = '04ece4ca20ee040e0e21680d6591ddfe';
+      const apiKey = '04ece4ca20ee040e0e21680d6591ddfe';
 
-    //   // Send DELETE request to ImgBB API
-    //   const response = await axios.delete(`https://api.imgbb.com/1/image/${deleteHash}?key=${apiKey}`);
+      // Send DELETE request to ImgBB API
+      const response = await axios.delete(`https://api.imgbb.com/1/image/${deleteHash}?key=${apiKey}`);
 
-    //   if (response.status === 200) {
-    //     // Image deleted successfully, update your component state or take any necessary actions
-    //     toast.success('Image deleted successfully');
-    //     console.log("Image deleted successfully");
-    //   } else {
-    //     toast.error('Failed to delete image');
-    //     console.error("Failed to delete image:", response.data);
-    //   }
-    // } catch (error) {
-    //   // Log detailed information about the error
-    //   console.error('Error deleting image:', error);
+      if (response.status === 200) {
+        // Image deleted successfully, update your component state or take any necessary actions
+        toast.success('Image deleted successfully');
+        console.log("Image deleted successfully");
+      } else {
+        toast.error('Failed to delete image');
+        console.error("Failed to delete image:", response.data);
+      }
+    } catch (error) {
+      // Log detailed information about the error
+      console.error('Error deleting image:', error);
 
-    //   // Check if the error response is available
-    //   if (error.response) {
-    //     console.error("Error response from ImgBB API:", error.response.data);
-    //   } else if (error.request) {
-    //     // The request was made but no response was received
-    //     console.error("No response received from ImgBB API. Request details:", error.request);
-    //   } else {
-    //     // Something happened in setting up the request that triggered an Error
-    //     console.error("Error setting up the request:", error.message);
-    //   }
+      // Check if the error response is available
+      if (error.response) {
+        console.error("Error response from ImgBB API:", error.response.data);
+      } else if (error.request) {
+        // The request was made but no response was received
+        console.error("No response received from ImgBB API. Request details:", error.request);
+      } else {
+        // Something happened in setting up the request that triggered an Error
+        console.error("Error setting up the request:", error.message);
+      }
 
-    //   toast.error('Error deleting image. Check console for details.');
-    // }
+      toast.error('Error deleting image. Check console for details.');
+    }
   };
   const handleDeletePhoto = (index) => {
     setPhotoGallery((prevGallery) => {
@@ -290,7 +330,46 @@ const AddDevices = () => {
     color: [{ name: "Color", subData: "" }],
     price: [{ name: "Price", subData: "" }],
   });
+  // Handle JSON import and update input data
+  const handleJsonImport = (importedData) => {
+    if (importedData) {
+      // Map imported data to form inputs
+      setInputData(importedData.data.reduce((acc, section) => {
+        acc[section.type] = section.subType;
+        return acc;
+      }, {}));
 
+      reset({
+        modelName: importedData.deviceName || "",
+        release_date: importedData.release_date || "",
+        status: importedData.status || "",
+        weight: importedData.weight || "",
+        thickness: importedData.thickness || "",
+        os_android: importedData.os_android || "",
+        os_brand: importedData.os_brand || "",
+        displaySize: importedData.displaySize || "",
+        displayResolution: importedData.displayResolution || "",
+        ram: importedData.ram || "",
+        storage: importedData.storage || "",
+        backCamera: importedData.backCamera || "",
+        backCameraVideo: importedData.backCameraVideo || "",
+        battery: importedData.battery || "",
+        chargingSpeed: importedData.chargingSpeed || "",
+        processor: importedData.processor || "",
+      });
+
+      setSelectedOption({ label: importedData.brand, value: importedData.brand });
+      setBannerImage(importedData.banner_img);
+      setPhotoGallery(importedData.galleryPhoto || []);
+      setExpandableStorageOption(importedData.expandable_storage || "no");
+      setExpandableStorageType(importedData.expandable_storage_type || "");
+
+      toast.success("JSON data imported successfully!");
+    }
+  };
+
+
+  // Rest of your code remains unchanged...
   const numberOfArrays = Object.keys(inputData).length;
 
   const handleCameraInput = (section, count = 1) => {
@@ -370,7 +449,7 @@ const AddDevices = () => {
       brand: `${selectedOption?.label}`,
       deviceName: `${data.modelName}`,
       release_date: data.release_date,
-      status:data.status,
+      status: data.status,
       banner_img: bannerImage,
       galleryPhoto: uploadedPhotoUrls,
       weight: `${data.weight}`,
@@ -393,7 +472,7 @@ const AddDevices = () => {
         subType,
       })),
     };
-console.log("devicesData", devicesData);
+    console.log("devicesData", devicesData);
     try {
       const response = await axios.post("https://mobile-project-server.onrender.com/api/devicesData", devicesData, {
         headers: {
@@ -411,11 +490,42 @@ console.log("devicesData", devicesData);
     }
   };
 
+// Event handler for Previous button mouse over
+const handlePreviousMouseOver = () => {
+  if (step > 1) {
+    setStep(step - 1);
+  }
+};
+
+// Event handler for Next button mouse over
+const handleNextMouseOver = () => {
+  if (step < steps.length) {
+    setStep(step + 1);
+  }
+};
 
   return (
     <div className="max-w-[1000px] w-full border-[2px] rounded-md">
       <h2 className="py-3 text-center text-xl">Add Device</h2>
+      <button
+        className="bg-blue-500 text-white px-4 py-2 rounded-md mb-4"
+        onClick={openModal}
+      >
+        Import JSON Data
+      </button>
 
+       {/* Step Navigation Menu */}
+      <div className="flex gap-x-3 flex-wrap whitespace-nowrap mb-4">
+        {steps.map((title, index) => (
+          <button
+            key={index}
+            onClick={() => setStep(index + 1)}
+            className={`px-4 py-2 rounded-md m-1 ${step === index + 1 ? 'bg-blue-500 text-white' : 'bg-gray-300 text-gray-700'}`}
+          >
+            {title}
+          </button>
+        ))}
+      </div>
       <div className="w-full flex justify-center items-center">
         <form
           onSubmit={handleSubmit(onSubmit)}
@@ -439,6 +549,7 @@ console.log("devicesData", devicesData);
                   name="color"
                   options={brandOption}
                   onChange={setSelectedOption}
+                  value={selectedOption}
                 />
               </div>
               <div className="w-full flex items-center gap-5 justify-between">
@@ -491,7 +602,6 @@ console.log("devicesData", devicesData);
                       image Delete
                     </button>
                   )}
-
                 </div>
               </div>
 
@@ -731,15 +841,9 @@ console.log("devicesData", devicesData);
                   <input
                     className="max-w-[560px] h-12 border-[2px] border-gray-500 rounded-md outline-none px-3 w-full"
                     type="text"
-                    {...register("processor", {
-
-
-                    })}
+                    {...register("processor", {})}
                   />
-
                 </div>
-
-
               </div>
             </div>
           )}
@@ -799,17 +903,15 @@ console.log("devicesData", devicesData);
             />
           )}
           {step === 8 && (
-
             <div className='w-full'>
-              {
-                !showFormSection && <div className='flex flex-col gap-4 w-full'>
+              {!showFormSection && (
+                <div className='flex flex-col gap-4 w-full'>
                   <label htmlFor="back_camera_number">Enter Back Camera Number</label>
                   <input
                     className='h-12 border-[2px] w-full border-gray-500 rounded-md outline-none px-3 appearance-none'
                     type="number"
                     id="back_camera_number"
                     value={backCameraNumber}
-
                     onChange={(e) => setBackCameraNumber(Math.max(0, parseInt(e.target.value, 10)))}
                   />
                   <button
@@ -819,10 +921,8 @@ console.log("devicesData", devicesData);
                   >
                     Create Input
                   </button>
-
                 </div>
-              }
-
+              )}
               {showFormSection && (
                 <div>
                   <StepFormSection
@@ -835,10 +935,8 @@ console.log("devicesData", devicesData);
                 </div>
               )}
             </div>
-
           )}
           {step === 9 && (
-
             <div className='w-full'>
               {!showFormSection && (
                 <div className='flex flex-col gap-4 w-full'>
@@ -869,8 +967,6 @@ console.log("devicesData", devicesData);
                 />
               )}
             </div>
-
-
           )}
           {step === 10 && (
             <StepFormSection
@@ -929,7 +1025,6 @@ console.log("devicesData", devicesData);
           {step === 16 && (
             <div className="w-full">
               <p className="text-center mt-3 mb-6 text-2xl">Set Photo Gallery</p>
-
               <div className="flex flex-wrap gap-3">
                 <div className="flex flex-wrap gap-3">
                   {photoGallery.map((photo, index) => (
@@ -946,10 +1041,16 @@ console.log("devicesData", devicesData);
                         <div>
                           <div className="relative max-w-[200px] w-full h-[300px] bg-slate-100 border-dashed border-[2px] border-black p-2 rounded-lg">
                             <img
-                              src={URL.createObjectURL(photo)}
+                              src={photo instanceof Blob ? URL.createObjectURL(photo) : ""}
                               alt={`Preview ${index + 1}`}
                               className="m-0 max-w-[200px] w-full h-[280px] object-contain"
+                              onLoad={(e) => {
+                                // Revoke the object URL after the image is loaded to free up memory
+                                URL.revokeObjectURL(e.target.src);
+                              }}
                             />
+
+
                             <button
                               type="button"
                               className="absolute top-[-12px] right-[-8px]"
@@ -988,12 +1089,7 @@ console.log("devicesData", devicesData);
                   Upload All Photos
                 </button>
               )}
-
             </div>
-
-
-
-
           )}
 
           {/* main data */}
@@ -1002,6 +1098,7 @@ console.log("devicesData", devicesData);
             {step > 1 && (
               <button
                 type="button"
+                  onMouseOver={handlePreviousMouseOver}
                 onClick={() => setStep(step - 1)}
                 className=" h-12 bg-gray-500 rounded-md outline-none px-3 text-white cursor-pointer w-full"
               >
@@ -1012,11 +1109,11 @@ console.log("devicesData", devicesData);
               <button
                 type="button"  // Set the button type to "button" to prevent form submission
                 onClick={() => [setStep(step + 1), setShowFormSection(false)]}
+                 onMouseOver={handleNextMouseOver}  // Add this line
                 className="h-12 bg-gray-500 rounded-md outline-none px-3 text-white cursor-pointer w-full"
               >
                 Next
               </button>
-
             )}
           </div>
           {step === 16 && (
@@ -1028,10 +1125,14 @@ console.log("devicesData", devicesData);
               />
             </div>
           )}
-
-          {/* submit btn */}
         </form>
       </div>
+      {/* Custom Modal for JSON import */}
+      <CustomModal
+        isOpen={isModalOpen}
+        onClose={closeModal}
+        onImport={handleJsonImport}
+      />
     </div>
   );
 };
