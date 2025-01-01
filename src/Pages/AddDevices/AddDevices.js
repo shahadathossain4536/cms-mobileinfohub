@@ -443,12 +443,17 @@ const AddDevices = () => {
     fetchData();
   }, []);
   const onSubmit = async (data) => {
-
+    // Generate href from deviceName
+    const href = data.modelName
+      .toLowerCase() // Convert to lowercase
+      .replace(/\s+/g, '-') // Replace spaces with hyphens
+      .replace(/[^a-z0-9-]/g, ''); // Remove any non-alphanumeric characters except hyphens
 
     const devicesData = {
       brand: `${selectedOption?.label}`,
       deviceName: `${data.modelName}`,
       release_date: data.release_date,
+      href: href, // Set the generated href
       status: data.status,
       banner_img: bannerImage,
       galleryPhoto: uploadedPhotoUrls,
