@@ -130,7 +130,7 @@ const AddBrandName = () => {
     console.log("brandData",brandData);
     try {
 
-      const response = await axios.post('https://mobile-project-server.onrender.com/api/brandName', brandData, {
+      const response = await axios.post('https://deviceinfohub-server.vercel.app/api/brandName', brandData, {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',

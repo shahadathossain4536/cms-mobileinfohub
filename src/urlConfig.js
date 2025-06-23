@@ -1,4 +1,4 @@
-export const api = "https://mobile-project-server.onrender.com/api";
+export const api = "https://deviceinfohub-server.vercel.app/api";
 export const generatePublicUrl = (fileName) => {
-  return `https://mobile-project-server.onrender.com/public/${fileName}`;
+  return `https://deviceinfohub-server.vercel.app/public/${fileName}`;
 };

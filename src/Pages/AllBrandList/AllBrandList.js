@@ -5,12 +5,12 @@ import { useQuery, useMutation, queryCache, useQueryClient } from 'react-query';
 import { Link } from 'react-router-dom';
 
 const fetchData = async () => {
-  const response = await axios.get('https://mobile-project-server.onrender.com/api/brandName');
+  const response = await axios.get('https://deviceinfohub-server.vercel.app/api/brandName');
   return response.data.brandNames;
 };
 
 const deleteBrand = async (id) => {
-  await axios.delete(`https://mobile-project-server.onrender.com/api/brandName/${id}`);
+  await axios.delete(`https://deviceinfohub-server.vercel.app/api/brandName/${id}`);
 };
 
 const AllBrandList = () => {

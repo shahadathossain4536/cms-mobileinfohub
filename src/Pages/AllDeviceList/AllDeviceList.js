@@ -36,11 +36,12 @@ const AllDeviceList = () => {
   const [totalPages, setTotalPages] = useState(0);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [deleteId, setDeleteId] = useState(null);
+  const [selectedDevices, setSelectedDevices] = useState([]);
 console.log("deleteId",deleteId);
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get('https://mobile-project-server.onrender.com/api/devicesData');
+        const response = await axios.get('https://deviceinfohub-server.vercel.app/api/devicesData');
         setAllDeviceData(response.data);
         setTotalPages(Math.ceil(response.data.length / itemsPerPage));
       } catch (error) {
@@ -64,7 +65,7 @@ console.log("deleteId",deleteId);
 const handleConfirmDelete = async () => {
   try {
     const token = window.localStorage.getItem("token"); // Retrieve the token from localStorage
-    await axios.delete(`https://mobile-project-server.onrender.com/api/devicesData/${deleteId}`, {
+    await axios.delete(`https://deviceinfohub-server.vercel.app/api/devicesData/${deleteId}`, {
       headers: {
         Authorization: `Bearer ${token}`, // Include the token in the Authorization header
       },
@@ -81,6 +82,24 @@ const handleConfirmDelete = async () => {
   }
 };
 
+  const handleDeleteSelected = async () => {
+    try {
+      const token = window.localStorage.getItem("token");
+      await Promise.all(selectedDevices.map(id =>
+        axios.delete(`https://deviceinfohub-server.vercel.app/api/devicesData/${id}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        })
+      ));
+      setAllDeviceData(allDeviceData.filter(device => !selectedDevices.includes(device._id)));
+      setSelectedDevices([]);
+      toast.success('Selected devices deleted successfully');
+    } catch (error) {
+      console.error('Error deleting selected devices:', error.message);
+      toast.error('Failed to delete selected devices. Please try again.');
+    }
+  };
 
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
@@ -133,6 +152,22 @@ const handleConfirmDelete = async () => {
     );
   };
 
+  const handleSelectDevice = (id) => {
+    setSelectedDevices((prevSelected) =>
+      prevSelected.includes(id)
+        ? prevSelected.filter((deviceId) => deviceId !== id)
+        : [...prevSelected, id]
+    );
+  };
+
+  const handleSelectAll = () => {
+    if (selectedDevices.length === currentItems.length) {
+      setSelectedDevices([]);
+    } else {
+      setSelectedDevices(currentItems.map((device) => device._id));
+    }
+  };
+
   return (
     <div className='w-full'>
       <h2 className='text-center text-2xl font-inter py-5'>All Device List</h2>
@@ -153,7 +188,24 @@ const handleConfirmDelete = async () => {
         </select>
       </div>
 
+      <div className='flex justify-end mb-4'>
+        <button
+          onClick={handleDeleteSelected}
+          disabled={selectedDevices.length === 0}
+          className='bg-red-500 text-white px-4 py-2 rounded'
+        >
+          Delete Selected
+        </button>
+      </div>
+
       <div className='flex w-full h-12 items-center bg-slate-400 bg-opacity-20 px-4'>
+        <div className='w-[5%]'>
+          <input
+            type="checkbox"
+            checked={selectedDevices.length === currentItems.length}
+            onChange={handleSelectAll}
+          />
+        </div>
         <div className='w-[10%]'><p>Device Image</p></div>
         <div className='w-[40%]'><p>Name</p></div>
         <div className='w-[20%]'>Brand</div>
@@ -164,6 +216,13 @@ const handleConfirmDelete = async () => {
       <ul>
         {currentItems.map((device, index) => (
           <div className='flex w-full h-12 items-center my-3 px-4 border-b-2 pb-2' key={index}>
+            <div className='w-[5%]'>
+              <input
+                type="checkbox"
+                checked={selectedDevices.includes(device._id)}
+                onChange={() => handleSelectDevice(device._id)}
+              />
+            </div>
             <div className='w-[10%]'>
               <img className='w-10 h-10 object-contain' src={device.banner_img} alt="" />
             </div>

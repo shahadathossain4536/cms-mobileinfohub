@@ -19,7 +19,7 @@ const UpdateDevice = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get("https://mobile-project-server.onrender.com/api/brandName");
+        const response = await axios.get("https://deviceinfohub-server.vercel.app/api/brandName");
 
         const formattedData = response.data.brandNames.map((brand) => ({
           label: brand.name,
@@ -38,7 +38,7 @@ const UpdateDevice = () => {
     const fetchData = async () => {
       try {
         const response = await axios.get(
-          `https://mobile-project-server.onrender.com/api/devicesData/${id}`
+          `https://deviceinfohub-server.vercel.app/api/devicesData/${id}`
         );
         const data = response.data;
 
@@ -485,7 +485,7 @@ const UpdateDevice = () => {
     console.log("devicesData", devicesData);
     try {
       const response = await axios.put(
-        `https://mobile-project-server.onrender.com/api/devicesData/${id}`, // Use PUT request for updating data
+        `https://deviceinfohub-server.vercel.app/api/devicesData/${id}`, // Use PUT request for updating data
         devicesData,
         {
           headers: {

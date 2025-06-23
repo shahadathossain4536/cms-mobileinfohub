@@ -429,7 +429,7 @@ const AddDevices = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get("https://mobile-project-server.onrender.com/api/brandName");
+        const response = await axios.get("https://deviceinfohub-server.vercel.app/api/brandName");
 
         const formattedData = response.data.brandNames.map((brand) => ({
           label: brand.name,
@@ -479,7 +479,7 @@ const AddDevices = () => {
     };
     console.log("devicesData", devicesData);
     try {
-      const response = await axios.post("https://mobile-project-server.onrender.com/api/devicesData", devicesData, {
+      const response = await axios.post("https://deviceinfohub-server.vercel.app/api/devicesData", devicesData, {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
