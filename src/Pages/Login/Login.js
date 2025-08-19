@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import Select from 'react-select';
 import { login } from '../../redux/actions/auth.actions';
 const Login = () => {
@@ -26,9 +26,11 @@ const Login = () => {
   } = useForm();
   const dispatch = useDispatch();
   const auth = useSelector((state) => state.auth);
-  const navigate = useNavigate()
+  const navigate = useNavigate();
+  const location = useLocation();
+  const from = location.state?.from?.pathname || '/dashboard';
   if (auth.authenticate) {
-    navigate('/dashboard');
+    navigate(from, { replace: true });
   }
   console.log("authauthauth",auth);
   const onSubmit = async (data) => {

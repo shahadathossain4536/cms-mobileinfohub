@@ -1,12 +1,13 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import Select from "react-select";
 import StepFormSection from "../../component/StepFormSection/StepFormSection";
-import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
 import toast from "react-hot-toast";
 import CustomModal from '../../component/CustomModal/CustomModal';
+import Button from '../../component/ui/Button';
+import Card, { CardContent } from '../../component/ui/Card';
+import Input from '../../component/ui/Input';
+import SelectUI from '../../component/ui/Select';
 
 const AddDevices = () => {
   const token = window.localStorage.getItem("token");
@@ -21,7 +22,7 @@ const AddDevices = () => {
   const [isDisabled, setIsDisabled] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isRtl, setIsRtl] = useState(false);
-  const [selectedOption, setSelectedOption] = useState(null);
+  const [selectedOption, setSelectedOption] = useState("");
   const [brandOption, setBrandOption] = useState([]);
   const [selectedImage, setSelectedImage] = useState(null);
   const [step, setStep] = useState(1);
@@ -144,7 +145,7 @@ const AddDevices = () => {
             'Content-Type': 'multipart/form-data',
           },
           params: {
-            key: '04ece4ca20ee040e0e21680d6591ddfe', // Replace with your actual API key
+            key: process.env.REACT_APP_IMGBB_KEY,
           },
         });
 
@@ -191,7 +192,7 @@ const AddDevices = () => {
       const deleteHash = deleteUrl.split('/').pop();
       console.log("deleteHash-------------", deleteHash);
 
-      const apiKey = '04ece4ca20ee040e0e21680d6591ddfe';
+      const apiKey = process.env.REACT_APP_IMGBB_KEY;
 
       // Send DELETE request to ImgBB API
       const response = await axios.delete(`https://api.imgbb.com/1/image/${deleteHash}?key=${apiKey}`);
@@ -234,7 +235,7 @@ const AddDevices = () => {
     setPhotoGallery((prevGallery) => [...prevGallery, null]);
   };
   const galleryPhotoUpload = async () => {
-    const apiKey = '04ece4ca20ee040e0e21680d6591ddfe';
+    const apiKey = process.env.REACT_APP_IMGBB_KEY;
     try {
       const uploadPromises = photoGallery.map(async (photo, index) => {
         if (photo) {
@@ -510,26 +511,33 @@ const handleNextMouseOver = () => {
 };
 
   return (
-    <div className="max-w-[1000px] w-full border-[2px] rounded-md">
-      <h2 className="py-3 text-center text-xl">Add Device</h2>
-      <button
-        className="bg-blue-500 text-white px-4 py-2 rounded-md mb-4"
-        onClick={openModal}
-      >
-        Import JSON Data
-      </button>
+    <div className="max-w-5xl w-full mx-auto">
+      <Card>
+        <CardContent>
+      <h2 className="py-3 text-center text-2xl font-semibold">Add Device</h2>
+      <Button variant='secondary' className="mb-4" onClick={openModal}>Import JSON Data</Button>
 
        {/* Step Navigation Menu */}
-      <div className="flex gap-x-3 flex-wrap whitespace-nowrap mb-4">
-        {steps.map((title, index) => (
-          <button
-            key={index}
-            onClick={() => setStep(index + 1)}
-            className={`px-4 py-2 rounded-md m-1 ${step === index + 1 ? 'bg-blue-500 text-white' : 'bg-gray-300 text-gray-700'}`}
-          >
-            {title}
-          </button>
-        ))}
+      <div className="mb-4">
+        <div className="flex items-center justify-between mb-2">
+          <p className="text-sm text-slate-600">Step {step} of {steps.length}</p>
+          <div className="flex gap-2 overflow-x-auto whitespace-nowrap">
+            {steps.map((title, index) => (
+              <Button
+                key={index}
+                size='sm'
+                variant={step === index + 1 ? 'primary' : 'secondary'}
+                className='shrink-0'
+                onClick={() => setStep(index + 1)}
+              >
+                {title}
+              </Button>
+            ))}
+          </div>
+        </div>
+        <div className="h-2 bg-slate-200 dark:bg-slate-700 rounded">
+          <div className="h-2 bg-brand-primary rounded" style={{ width: `${(step/steps.length)*100}%` }} />
+        </div>
       </div>
       <div className="w-full flex justify-center items-center">
         <form
@@ -538,25 +546,13 @@ const handleNextMouseOver = () => {
         >
           {/* banner data */}
           {step === 1 && (
-            <div className="w-full">
-              <div className="w-full my-4">
-                <p className="py-2 font-raleway font-medium text-lg sm:px-0 px-5">
-                  Brand Name
-                </p>
-                <Select
-                  className="basic-single sm:px-0 px-5"
-                  classNamePrefix="select"
-                  isDisabled={isDisabled}
-                  isLoading={isLoading}
-                  isClearable={isClearable}
-                  isRtl={isRtl}
-                  isSearchable={isSearchable}
-                  name="color"
-                  options={brandOption}
-                  onChange={setSelectedOption}
-                  value={selectedOption}
-                />
-              </div>
+            <div className="w-full grid grid-cols-1 gap-4 my-4">
+              <SelectUI label="Brand Name" value={selectedOption} onChange={(e) => setSelectedOption(e.target.value)}>
+                <option value="">Select brand</option>
+                {brandOption.map((b) => (
+                  <option key={b.value} value={b.value}>{b.label}</option>
+                ))}
+              </SelectUI>
               <div className="w-full flex items-center gap-5 justify-between">
                 <div className="max-w-[150px] w-full h-[200px]">
                   <input
@@ -589,196 +585,87 @@ const handleNextMouseOver = () => {
 
                   {console.log("isImageSelected", isImageSelected)}
                   {selectedImage && (
-                    <button
+                    <Button
                       type="button"
                       onClick={handleUploadButtonClick}
-                      disabled={isUploadSuccessful} // Disable the button if the upload is successful
-                      className="max-w-[150px] w-full h-[40px] bg-blue-500 text-white rounded-md outline-none px-3 cursor-pointer disabled:bg-slate-200"
+                      disabled={isUploadSuccessful}
+                      className="max-w-[150px] w-full h-[40px]"
                     >
                       Upload
-                    </button>
+                    </Button>
                   )}
                   {deleteButtonVisible && (
-                    <button
+                    <Button
                       type="button"
-                      className="max-w-[150px] w-full h-[40px] bg-red-500 text-white rounded-md outline-none px-3 cursor-pointer"
+                      variant='danger'
+                      className="max-w-[150px] w-full h-[40px]"
                       onClick={() => handleDeleteButtonClick(imageDeleteHash)}
                     >
-                      image Delete
-                    </button>
+                      Delete Image
+                    </Button>
                   )}
                 </div>
               </div>
 
-              <div className="w-full">
-                <label htmlFor="">Model Name</label>
-                <input
-                  className="max-w-[560px] h-12 border-[2px] border-gray-500 rounded-md outline-none px-3 w-full"
-                  type="text"
-                  {...register("modelName", {
-                    required: {
-                      value: true,
-                      message: "Enter Your Model Name",
-                    },
-                  })}
-                />
-                <label className="label">
-                  {errors.modelName?.type === "required" && (
-                    <span className="label-text-alt text-red-600">
-                      {errors?.modelName?.message}
-                    </span>
-                  )}
-                </label>
-              </div>
-              <div className="w-full">
-                <label className="block" htmlFor="">
-                  Release Date
-                </label>
-                <input
-                  className="max-w-[560px] h-12 border-[2px] border-gray-500 rounded-md outline-none px-3 w-full"
-                  type="text"
-                  {...register("release_date", {})}
-                />
-                {errors.release_date && (
-                  <p className="error-message">{errors.release_date.message}</p>
-                )}
-              </div>
-              <div className="w-full">
-                <label htmlFor="status">Status</label>
-                <select
-                  {...register('status')}
-                  className="max-w-[560px] h-12 border-[2px] border-gray-500 rounded-md outline-none px-3 w-full"
-                >
-                  <option value="">Select Status Option</option>
-                  <option selected value="Available">Available</option>
-                  <option value="Coming soon">Coming soon</option>
-                </select>
-                {errors.status && (
-                  <p className="error-message">{errors.status.message}</p>
-                )}
-              </div>
+              <Input label="Model Name" type="text" {...register("modelName", { required: { value: true, message: "Enter Your Model Name" } })} />
+              <Input label="Release Date" type="text" {...register("release_date", {})} />
+              <SelectUI label="Status" {...register('status')}>
+                <option value="">Select Status Option</option>
+                <option value="Available">Available</option>
+                <option value="Coming soon">Coming soon</option>
+              </SelectUI>
               <div className="w-full flex gap-4">
                 <div className="w-full">
-                  <label htmlFor="">Weight</label>
-                  <input
-                    className="max-w-[560px] h-12 border-[2px] border-gray-500 rounded-md outline-none px-3 w-full"
-                    type="text"
-                    {...register("weight", {})}
-                  />
+                  <Input label="Weight" type="text" {...register("weight", {})} />
                 </div>
                 <div className="w-full">
-                  <label htmlFor="">thickness</label>
-                  <input
-                    className="max-w-[560px] h-12 border-[2px] border-gray-500 rounded-md outline-none px-3 w-full"
-                    type="text"
-                    {...register("thickness", {})}
-                  />
+                  <Input label="Thickness" type="text" {...register("thickness", {})} />
                 </div>
               </div>
               <div className="w-full flex gap-4">
                 <div className="w-full">
-                  <label htmlFor="">os_android</label>
-                  <input
-                    className="max-w-[560px] h-12 border-[2px] border-gray-500 rounded-md outline-none px-3 w-full"
-                    type="text"
-                    {...register("os_android", {})}
-                  />
+                  <Input label="OS (Android)" type="text" {...register("os_android", {})} />
                 </div>
                 <div className="w-full">
-                  <label htmlFor="">os_brand</label>
-                  <input
-                    className="max-w-[560px] h-12 border-[2px] border-gray-500 rounded-md outline-none px-3 w-full"
-                    type="text"
-                    {...register("os_brand", {})}
-                  />
+                  <Input label="OS (Brand)" type="text" {...register("os_brand", {})} />
                 </div>
               </div>
               <div className="w-full flex gap-4">
                 <div className="w-full">
-                  <label htmlFor="">displaySize</label>
-                  <input
-                    className="max-w-[560px] h-12 border-[2px] border-gray-500 rounded-md outline-none px-3 w-full"
-                    type="text"
-                    {...register("displaySize", {})}
-                  />
+                  <Input label="Display Size" type="text" {...register("displaySize", {})} />
                 </div>
                 <div className="w-full">
-                  <label htmlFor="">displayResolution</label>
-                  <input
-                    className="max-w-[560px] h-12 border-[2px] border-gray-500 rounded-md outline-none px-3 w-full"
-                    type="text"
-                    {...register("displayResolution", {})}
-                  />
+                  <Input label="Display Resolution" type="text" {...register("displayResolution", {})} />
                 </div>
               </div>
               <div className="flex justify-center gap-4 w-full">
                 <div className="w-full">
-                  <label htmlFor="expandableStorage">Expandable Storage:</label>
-                  <select
-                    id="expandableStorage"
-                    value={expandableStorageOption}
-                    onChange={handleExpandableStorageChange}
-                    className="max-w-[560px] h-12 border-[2px] border-gray-500 rounded-md outline-none px-3 w-full"
-                  >
+                  <SelectUI label="Expandable Storage" id="expandableStorage" value={expandableStorageOption} onChange={handleExpandableStorageChange}>
                     <option value="yes">Yes</option>
                     <option value="no">No</option>
-                  </select>
+                  </SelectUI>
                 </div>
 
                 {expandableStorageOption === "yes" && (
                   <div className="w-full">
-                    <label htmlFor="expandableStorageType">Expandable Storage Type:</label>
-                    <select
-                      id="expandableStorageType"
-                      value={expandableStorageType}
-                      onChange={(e) => setExpandableStorageType(e.target.value)}
-                      className="max-w-[560px] h-12 border-[2px] border-gray-500 rounded-md outline-none px-3 w-full"
-                    >
+                    <SelectUI label="Expandable Storage Type" id="expandableStorageType" value={expandableStorageType} onChange={(e) => setExpandableStorageType(e.target.value)}>
                       <option value="">Select Storage Type</option>
                       <option value="microSDXC">microSDXC</option>
                       <option value="Nano Memory">Nano Memory</option>
-                    </select>
+                    </SelectUI>
                   </div>
                 )}
               </div>
               <div className="w-full flex gap-4">
                 <div className="w-full">
-                  <label htmlFor="">RAM</label>
-                  <input
-                    className="max-w-[560px] h-12 border-[2px] border-gray-500 rounded-md outline-none px-3 w-full"
-                    type="text"
-                    {...register("ram", {
-                      required: {
-                        value: true,
-                        message: "Enter RAM value",
-                      },
-                      pattern: {
-                        value: /^[0-9]+$/,
-                        message: "Please enter a valid number for RAM",
-                      },
-                    })}
-                  />
+                  <Input label="RAM" type="text" {...register("ram", { required: { value: true, message: "Enter RAM value" }, pattern: { value: /^[0-9]+$/, message: "Please enter a valid number for RAM" } })} />
                   {errors.ram && (
                     <span className="error-message">{errors.ram.message}</span>
                   )}
                 </div>
 
                 <div className="w-full">
-                  <label htmlFor="">Storage</label>
-                  <input
-                    className="max-w-[560px] h-12 border-[2px] border-gray-500 rounded-md outline-none px-3 w-full"
-                    type="text"
-                    {...register("storage", {
-                      required: {
-                        value: true,
-                        message: "Enter Storage value",
-                      },
-                      pattern: {
-                        value: /^[0-9]+$/,
-                        message: "Please enter a valid number for Storage",
-                      },
-                    })}
-                  />
+                  <Input label="Storage" type="text" {...register("storage", { required: { value: true, message: "Enter Storage value" }, pattern: { value: /^[0-9]+$/, message: "Please enter a valid number for Storage" } })} />
                   {errors.storage && (
                     <span className="error-message">
                       {errors.storage.message}
@@ -788,66 +675,29 @@ const handleNextMouseOver = () => {
               </div>
               <div className="w-full flex gap-4">
                 <div className="w-full">
-                  <label htmlFor="">Back Camera</label>
-                  <input
-                    className="max-w-[560px] h-12 border-[2px] border-gray-500 rounded-md outline-none px-3 w-full"
-                    type="text"
-                    {...register("backCamera", {
-
-
-                    })}
-                  />
+                  <Input label="Back Camera" type="text" {...register("backCamera", {})} />
 
                 </div>
 
                 <div className="w-full">
-                  <label htmlFor="">Back Camera Video</label>
-                  <input
-                    className="max-w-[560px] h-12 border-[2px] border-gray-500 rounded-md outline-none px-3 w-full"
-                    type="text"
-                    {...register("backCameraVideo", {
-
-
-                    })}
-                  />
+                  <Input label="Back Camera Video" type="text" {...register("backCameraVideo", {})} />
 
                 </div>
               </div>
               <div className="w-full flex gap-4">
                 <div className="w-full">
-                  <label htmlFor="">Battery</label>
-                  <input
-                    className="max-w-[560px] h-12 border-[2px] border-gray-500 rounded-md outline-none px-3 w-full"
-                    type="text"
-                    {...register("battery", {
-
-
-                    })}
-                  />
+                  <Input label="Battery" type="text" {...register("battery", {})} />
 
                 </div>
 
                 <div className="w-full">
-                  <label htmlFor="">Charging Speed</label>
-                  <input
-                    className="max-w-[560px] h-12 border-[2px] border-gray-500 rounded-md outline-none px-3 w-full"
-                    type="text"
-                    {...register("chargingSpeed", {
-
-
-                    })}
-                  />
+                  <Input label="Charging Speed" type="text" {...register("chargingSpeed", {})} />
 
                 </div>
               </div>
               <div className="w-full flex gap-4">
                 <div className="w-full">
-                  <label htmlFor="">Processor</label>
-                  <input
-                    className="max-w-[560px] h-12 border-[2px] border-gray-500 rounded-md outline-none px-3 w-full"
-                    type="text"
-                    {...register("processor", {})}
-                  />
+                  <Input label="Processor" type="text" {...register("processor", {})} />
                 </div>
               </div>
             </div>
@@ -919,13 +769,13 @@ const handleNextMouseOver = () => {
                     value={backCameraNumber}
                     onChange={(e) => setBackCameraNumber(Math.max(0, parseInt(e.target.value, 10)))}
                   />
-                  <button
+                  <Button
                     type="button"
-                    className='bg-green-500 rounded-lg w-full text-white text-xs h-12 px-1'
+                    className='w-full h-12'
                     onClick={() => handleCreateButtonClick("main_camera")}
                   >
                     Create Input
-                  </button>
+                  </Button>
                 </div>
               )}
               {showFormSection && (
@@ -953,13 +803,13 @@ const handleNextMouseOver = () => {
                     value={frontCameraNumber}
                     onChange={(e) => setFrontCameraNumber(Math.max(0, parseInt(e.target.value, 10)))}
                   />
-                  <button
+                  <Button
                     type="button"
-                    className='bg-green-500 rounded-lg w-full text-white text-xs h-12 px-1'
+                    className='w-full h-12'
                     onClick={() => handleSelfieCameraInput("selfie_camera")}
                   >
                     Create Input
-                  </button>
+                  </Button>
                 </div>
               )}
               {showFormSection && (
@@ -1077,22 +927,23 @@ const handleNextMouseOver = () => {
                     </div>
                   ))}
                 </div>
-                <button
+                <Button
                   type="button"
-                  className="max-w-[200px] w-full h-[300px] bg-slate-200 rounded-lg "
+                  variant='secondary'
+                  className="max-w-[200px] w-full h-[50px]"
                   onClick={handleAddPhotoInput}
                 >
                   Add Photo
-                </button>
+                </Button>
               </div>
               {photoGallery.some(photo => photo) && (
-                <button
+                <Button
                   type="button"
-                  className="max-w-[200px] w-full h-[50px] bg-blue-500 rounded-lg"
+                  className="max-w-[200px] w-full h-[50px]"
                   onClick={galleryPhotoUpload}
                 >
                   Upload All Photos
-                </button>
+                </Button>
               )}
             </div>
           )}
@@ -1101,33 +952,30 @@ const handleNextMouseOver = () => {
           {/* submit btn */}
           <div className="w-full flex justify-center items-center gap-5 my-6">
             {step > 1 && (
-              <button
+              <Button
                 type="button"
-                  onMouseOver={handlePreviousMouseOver}
+                onMouseOver={handlePreviousMouseOver}
                 onClick={() => setStep(step - 1)}
-                className=" h-12 bg-gray-500 rounded-md outline-none px-3 text-white cursor-pointer w-full"
+                variant='secondary'
+                className='w-full'
               >
                 Previous
-              </button>
+              </Button>
             )}
             {step < 16 && (
-              <button
-                type="button"  // Set the button type to "button" to prevent form submission
+              <Button
+                type="button"
                 onClick={() => [setStep(step + 1), setShowFormSection(false)]}
-                 onMouseOver={handleNextMouseOver}  // Add this line
-                className="h-12 bg-gray-500 rounded-md outline-none px-3 text-white cursor-pointer w-full"
+                onMouseOver={handleNextMouseOver}
+                className='w-full'
               >
                 Next
-              </button>
+              </Button>
             )}
           </div>
           {step === 16 && (
             <div className="w-full my-6">
-              <input
-                className="max-w-[560px] h-12 bg-gray-500 rounded-md outline-none px-3 text-white cursor-pointer w-full"
-                type="submit"
-                value="Submit"
-              />
+              <Button type='submit' className='w-full h-12'>Submit</Button>
             </div>
           )}
         </form>
@@ -1138,6 +986,8 @@ const handleNextMouseOver = () => {
         onClose={closeModal}
         onImport={handleJsonImport}
       />
+        </CardContent>
+      </Card>
     </div>
   );
 };

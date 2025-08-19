@@ -14,6 +14,12 @@ import AllDeviceList from './Pages/AllDeviceList/AllDeviceList';
 import UpdateDevice from './Pages/UpdateDevice/UpdateDevice';
 import AllBrandList from './Pages/AllBrandList/AllBrandList';
 import Advertisement from './Pages/Advertisement/Advertisement';
+import React from 'react';
+import ErrorBoundary from './component/ui/ErrorBoundary';
+import LoadingOverlay from './component/ui/LoadingOverlay';
+import Devices from './Pages/Devices/Devices';
+
+const NotFound = React.lazy(() => import('./Pages/NotFound'));
 
 function App() {
   return (
@@ -24,6 +30,8 @@ function App() {
         reverseOrder={false}
       />
 
+      <LoadingOverlay />
+      <ErrorBoundary>
       <Routes>
         <Route path="/" element={<Login />} />
         <Route path="/login" element={<Login />} />
@@ -40,14 +48,15 @@ function App() {
           <Route path='add-brand-name' element={<AddBrandName />} />
           <Route path='add-device' element={<AddDevices />} />
           <Route path='all-devices-list' element={<AllDeviceList />} />
+          <Route path='devices' element={<Devices />} />
           <Route path='all-brand-list' element={<AllBrandList />} />
           <Route path='update-device/:id' element={<UpdateDevice />} />
           <Route path='advertisement' element={<Advertisement />} />
 
         </Route>
-
-
+        <Route path='*' element={<React.Suspense fallback={<div />}>{<NotFound />}</React.Suspense>} />
       </Routes>
+      </ErrorBoundary>
     </div>
 
   );

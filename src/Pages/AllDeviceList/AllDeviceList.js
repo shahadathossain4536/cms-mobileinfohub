@@ -1,7 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import axiosInstance from '../../helpers/axios';
+import Loading from '../../component/ui/Loading';
+import ErrorState from '../../component/ui/ErrorState';
 import { Link } from 'react-router-dom';
 import toast from 'react-hot-toast';
+import Card, { CardHeader, CardContent } from '../../component/ui/Card';
+import Button from '../../component/ui/Button';
+import { useDevices, useDeleteDevice } from '../../helpers/queries/deviceQueries';
 const ConfirmationModal = ({ isOpen, onClose, onConfirm }) => {
   if (!isOpen) return null;
 
@@ -30,7 +35,9 @@ const ConfirmationModal = ({ isOpen, onClose, onConfirm }) => {
 };
 
 const AllDeviceList = () => {
-  const [allDeviceData, setAllDeviceData] = useState([]);
+  const { data: devicesData, isLoading, isError, refetch } = useDevices();
+  const deleteDeviceMutation = useDeleteDevice();
+  const allDeviceData = devicesData || [];
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [totalPages, setTotalPages] = useState(0);
@@ -39,18 +46,10 @@ const AllDeviceList = () => {
   const [selectedDevices, setSelectedDevices] = useState([]);
 console.log("deleteId",deleteId);
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await axios.get('https://deviceinfohub-server.vercel.app/api/devicesData');
-        setAllDeviceData(response.data);
-        setTotalPages(Math.ceil(response.data.length / itemsPerPage));
-      } catch (error) {
-        console.error('Error fetching data:', error.message);
-      }
-    };
-
-    fetchData();
-  }, [itemsPerPage]);
+    if (allDeviceData?.length != null) {
+      setTotalPages(Math.ceil(allDeviceData.length / itemsPerPage));
+    }
+  }, [allDeviceData, itemsPerPage]);
 
   const openModal = (id) => {
     setDeleteId(id);
@@ -65,12 +64,8 @@ console.log("deleteId",deleteId);
 const handleConfirmDelete = async () => {
   try {
     const token = window.localStorage.getItem("token"); // Retrieve the token from localStorage
-    await axios.delete(`https://deviceinfohub-server.vercel.app/api/devicesData/${deleteId}`, {
-      headers: {
-        Authorization: `Bearer ${token}`, // Include the token in the Authorization header
-      },
-    });
-    setAllDeviceData(allDeviceData.filter(device => device._id !== deleteId));
+    await deleteDeviceMutation.mutateAsync(deleteId);
+    refetch();
     closeModal();
 
     // Show success toast
@@ -85,14 +80,8 @@ const handleConfirmDelete = async () => {
   const handleDeleteSelected = async () => {
     try {
       const token = window.localStorage.getItem("token");
-      await Promise.all(selectedDevices.map(id =>
-        axios.delete(`https://deviceinfohub-server.vercel.app/api/devicesData/${id}`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        })
-      ));
-      setAllDeviceData(allDeviceData.filter(device => !selectedDevices.includes(device._id)));
+      await Promise.all(selectedDevices.map(id => deleteDeviceMutation.mutateAsync(id)));
+      refetch();
       setSelectedDevices([]);
       toast.success('Selected devices deleted successfully');
     } catch (error) {
@@ -170,52 +159,55 @@ const handleConfirmDelete = async () => {
 
   return (
     <div className='w-full'>
-      <h2 className='text-center text-2xl font-inter py-5'>All Device List</h2>
-
-      <div className='flex justify-end mb-4'>
-        <label htmlFor="itemsPerPage" className="mr-2">Items per page:</label>
-        <select
-          id="itemsPerPage"
-          value={itemsPerPage}
-          onChange={handleItemsPerPageChange}
-          className="border px-2 py-1 rounded"
-        >
-          <option value={10}>10</option>
-          <option value={20}>20</option>
-          <option value={30}>30</option>
-          <option value={40}>40</option>
-          <option value={50}>50</option>
-        </select>
-      </div>
-
-      <div className='flex justify-end mb-4'>
-        <button
-          onClick={handleDeleteSelected}
-          disabled={selectedDevices.length === 0}
-          className='bg-red-500 text-white px-4 py-2 rounded'
-        >
-          Delete Selected
-        </button>
-      </div>
-
-      <div className='flex w-full h-12 items-center bg-slate-400 bg-opacity-20 px-4'>
-        <div className='w-[5%]'>
-          <input
-            type="checkbox"
-            checked={selectedDevices.length === currentItems.length}
-            onChange={handleSelectAll}
-          />
-        </div>
-        <div className='w-[10%]'><p>Device Image</p></div>
-        <div className='w-[40%]'><p>Name</p></div>
-        <div className='w-[20%]'>Brand</div>
-        <div className='w-[10%]'></div>
-        <div className='w-[10%]'></div>
-      </div>
+      {isLoading && <Loading label="Loading devices..." />}
+      {!isLoading && isError && <ErrorState title="Failed to load devices" onRetry={refetch} />}
+      {!isLoading && !isError && (
+      <>
+      <Card className='mb-4'>
+        <CardHeader>
+          <div className='flex items-center justify-between'>
+            <h2 className='text-lg font-semibold'>All Devices</h2>
+            <div className='flex items-center gap-3'>
+              <label htmlFor="itemsPerPage" className="text-sm">Per page</label>
+              <select
+                id="itemsPerPage"
+                value={itemsPerPage}
+                onChange={handleItemsPerPageChange}
+                className="border px-2 py-1 rounded bg-white dark:bg-slate-800"
+              >
+                <option value={10}>10</option>
+                <option value={20}>20</option>
+                <option value={30}>30</option>
+                <option value={40}>40</option>
+                <option value={50}>50</option>
+              </select>
+              <Button variant='danger' onClick={handleDeleteSelected} disabled={selectedDevices.length === 0}>Delete Selected</Button>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <div className='flex w-full h-12 items-center bg-slate-100 dark:bg-slate-700 rounded px-4'>
+            <div className='w-[5%]'>
+              <input
+                type="checkbox"
+                checked={selectedDevices.length === currentItems.length}
+                onChange={handleSelectAll}
+              />
+            </div>
+            <div className='w-[10%]'><p>Device Image</p></div>
+            <div className='w-[40%]'><p>Name</p></div>
+            <div className='w-[20%]'>Brand</div>
+            <div className='w-[10%]'></div>
+            <div className='w-[10%]'></div>
+          </div>
+        </CardContent>
+      </Card>
 
       <ul>
-        {currentItems.map((device, index) => (
-          <div className='flex w-full h-12 items-center my-3 px-4 border-b-2 pb-2' key={index}>
+        {currentItems.length === 0 ? (
+          <li className='py-10 text-center text-gray-600'>No devices found.</li>
+        ) : currentItems.map((device, index) => (
+          <div className='flex w-full h-16 items-center my-2 px-4 border rounded-lg dark:border-slate-700 bg-white dark:bg-slate-800' key={index}>
             <div className='w-[5%]'>
               <input
                 type="checkbox"
@@ -231,15 +223,10 @@ const handleConfirmDelete = async () => {
             </div>
             <div className='w-[20%]'>{device.brand}</div>
             <div className='w-[10%]'>
-              <Link to={`/dashboard/update-device/${device._id}`} className='h-10 w-20 bg-green-500 text-white cursor-pointer'>Edit</Link>
+              <Link to={`/dashboard/update-device/${device._id}`} className='inline-flex items-center justify-center h-10 w-20 rounded-md bg-green-600 text-white'>Edit</Link>
             </div>
             <div className='w-[10%]'>
-              <button
-                className='h-10 w-20 bg-red-500 text-white cursor-pointer'
-                onClick={() => openModal(device._id)}
-              >
-                Delete
-              </button>
+              <Button variant='danger' onClick={() => openModal(device._id)}>Delete</Button>
             </div>
           </div>
         ))}
@@ -284,6 +271,8 @@ const handleConfirmDelete = async () => {
         onClose={closeModal}
         onConfirm={handleConfirmDelete}
       />
+      </>
+      )}
     </div>
   );
 };
