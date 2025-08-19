@@ -1,41 +1,43 @@
 import React from 'react';
 
 export const Table = ({ children, className = '' }) => (
-  <div className={`overflow-hidden rounded-xl border border-slate-200 dark:border-slate-700 ${className}`}>
-    <div className="min-w-full divide-y divide-slate-200 dark:divide-slate-700">
-      {children}
+  <div className={`overflow-hidden rounded-xl border border-slate-200 dark:border-slate-800 ${className}`}>
+    <div className="overflow-x-auto">
+      <table className="min-w-full divide-y divide-slate-200 dark:divide-slate-800">
+        {children}
+      </table>
     </div>
   </div>
 );
 
-export const THead = ({ children }) => (
-  <div className="bg-slate-100 dark:bg-slate-700/50">
-    <div className="grid grid-cols-12 px-4 h-12 items-center text-sm font-medium text-slate-700 dark:text-slate-300">
-      {children}
-    </div>
-  </div>
-);
-
-export const TBody = ({ children }) => (
-  <div className="divide-y divide-slate-200 dark:divide-slate-700 bg-white dark:bg-slate-800">
+export const THead = ({ children, className = '' }) => (
+  <thead className={`bg-slate-50 dark:bg-slate-900/50 ${className}`}>
     {children}
-  </div>
+  </thead>
 );
 
-export const TR = ({ children }) => (
-  <div className="grid grid-cols-12 px-4 h-16 items-center">
+export const TBody = ({ children, className = '' }) => (
+  <tbody className={`divide-y divide-slate-200 dark:divide-slate-800 bg-white dark:bg-slate-900 ${className}`}>
     {children}
-  </div>
+  </tbody>
 );
 
-export const TH = ({ className = '', children }) => (
-  <div className={`col-span-2 ${className}`}>{children}</div>
+export const TR = ({ children, className = '', hover = true }) => (
+  <tr className={`${hover ? 'hover:bg-slate-50 dark:hover:bg-slate-900/50 transition-colors duration-150' : ''} ${className}`}>
+    {children}
+  </tr>
 );
 
-export const TD = ({ className = '', children }) => (
-  <div className={`col-span-2 ${className}`}>{children}</div>
+export const TH = ({ children, className = '', ...props }) => (
+  <th className={`px-6 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider ${className}`} {...props}>
+    {children}
+  </th>
+);
+
+export const TD = ({ children, className = '', ...props }) => (
+  <td className={`px-6 py-4 whitespace-nowrap text-sm text-slate-900 dark:text-slate-100 ${className}`} {...props}>
+    {children}
+  </td>
 );
 
 export default Table;
-
-
