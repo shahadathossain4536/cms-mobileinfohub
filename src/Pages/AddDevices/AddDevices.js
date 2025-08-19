@@ -4,6 +4,7 @@ import { useForm } from "react-hook-form";
 import StepFormSection from "../../component/StepFormSection/StepFormSection";
 import toast from "react-hot-toast";
 import CustomModal from '../../component/CustomModal/CustomModal';
+import ImageToJsonModal from '../../component/CustomModal/ImageToJsonModal';
 import Button from '../../component/ui/Button';
 import Card, { CardContent } from '../../component/ui/Card';
 import Input from '../../component/ui/Input';
@@ -43,6 +44,7 @@ const AddDevices = () => {
   const [isUploadSuccessful, setIsUploadSuccessful] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [jsonFile, setJsonFile] = useState(null);
+  const [isImageToJsonOpen, setIsImageToJsonOpen] = useState(false);
   const steps = [
     "Banner Data",
     "Network",
@@ -69,6 +71,9 @@ const AddDevices = () => {
   const closeModal = () => {
     setIsModalOpen(false);
   };
+
+  const openImageToJson = () => setIsImageToJsonOpen(true);
+  const closeImageToJson = () => setIsImageToJsonOpen(false);
 
   const handleJsonFileChange = (e) => {
     const file = e.target.files[0];
@@ -515,7 +520,10 @@ const handleNextMouseOver = () => {
       <Card>
         <CardContent>
       <h2 className="py-3 text-center text-2xl font-semibold">Add Device</h2>
-      <Button variant='secondary' className="mb-4" onClick={openModal}>Import JSON Data</Button>
+      <div className="flex gap-3 mb-4">
+        <Button variant='secondary' onClick={openModal}>Import JSON Data</Button>
+        <Button variant='outline' onClick={openImageToJson}>Image to JSON</Button>
+      </div>
 
        {/* Step Navigation Menu */}
       <div className="mb-4">
@@ -986,6 +994,9 @@ const handleNextMouseOver = () => {
         onClose={closeModal}
         onImport={handleJsonImport}
       />
+
+      {/* Image to JSON Modal */}
+      <ImageToJsonModal isOpen={isImageToJsonOpen} onClose={closeImageToJson} onImport={handleJsonImport} />
         </CardContent>
       </Card>
     </div>
