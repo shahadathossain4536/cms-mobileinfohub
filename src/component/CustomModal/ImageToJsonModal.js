@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import axios from '../../helpers/axios';
 
 const ImageToJsonModal = ({ isOpen, onClose, onImport }) => {
@@ -6,14 +6,45 @@ const ImageToJsonModal = ({ isOpen, onClose, onImport }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [result, setResult] = useState(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const fileInputRef = useRef(null);
 
   if (!isOpen) return null;
 
-  const onFileChange = (e) => {
-    setFile(e.target.files?.[0] || null);
+  const assignFile = (f) => {
+    if (!f) return;
+    setFile(f);
     setError(null);
     setResult(null);
   };
+
+  const onFileChange = (e) => {
+    assignFile(e.target.files?.[0] || null);
+  };
+
+  const onDrop = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+    const droppedFiles = e.dataTransfer?.files;
+    if (droppedFiles && droppedFiles.length > 0) {
+      assignFile(droppedFiles[0]);
+    }
+  };
+
+  const onDragOver = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(true);
+  };
+
+  const onDragLeave = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+  };
+
+  const onClickPick = () => fileInputRef.current?.click();
 
   const onSubmit = async () => {
     try {
@@ -37,16 +68,14 @@ const ImageToJsonModal = ({ isOpen, onClose, onImport }) => {
       const data = response?.data || {};
       setResult(data);
 
-      // Auto-apply to the form if handler provided
       if (typeof onImport === 'function') {
         try {
           onImport(data);
         } catch (_) {
-          // swallow errors from parent handler to keep modal responsive
+          // keep modal responsive
         }
       }
 
-      // Auto-close after successful response
       onClose?.();
     } catch (err) {
       const message = err?.response?.data?.error || err?.message || 'Upload failed';
@@ -58,16 +87,36 @@ const ImageToJsonModal = ({ isOpen, onClose, onImport }) => {
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
-      <div className="bg-white dark:bg-slate-900 rounded-lg shadow-lg p-6 w/full max-w-2xl">
+      <div className="bg-white dark:bg-slate-900 rounded-lg shadow-lg p-6 w-full max-w-2xl">
         <h2 className="text-xl font-semibold mb-4 text-slate-900 dark:text-white">Image to JSON</h2>
 
         <div className="space-y-4">
-          <input
-            type="file"
-            accept="image/*"
-            onChange={onFileChange}
-            className="w-full text-sm text-slate-700 dark:text-slate-200"
-          />
+          {/* Dropzone */}
+          <div
+            onDragOver={onDragOver}
+            onDragLeave={onDragLeave}
+            onDrop={onDrop}
+            onClick={onClickPick}
+            className={`border-2 border-dashed rounded-lg p-6 cursor-pointer transition-colors
+              ${isDragging ? 'border-brand-primary bg-brand-primary/5' : 'border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900'}`}
+          >
+            <div className="flex flex-col items-center text-center gap-2">
+              <svg className="w-8 h-8 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6H16a5 5 0 011 9.9M15 13l-3-3-3 3m3-3v12" />
+              </svg>
+              <p className="text-sm text-slate-600 dark:text-slate-300">Drag & drop an image here, or click to browse</p>
+              {file && (
+                <p className="text-xs text-slate-500 dark:text-slate-400">Selected: {file.name}</p>
+              )}
+            </div>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              onChange={onFileChange}
+              className="hidden"
+            />
+          </div>
 
           <div className="flex justify-end gap-2">
             <button
