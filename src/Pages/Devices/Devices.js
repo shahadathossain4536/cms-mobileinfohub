@@ -8,6 +8,8 @@ import AllDeviceList from '../AllDeviceList/AllDeviceList';
 const Devices = () => {
   const [open, setOpen] = useState(false);
 
+  console.log('Devices component rendering...');
+
   return (
     <div className='w-full'>
       <Card className='mb-4'>

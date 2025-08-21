@@ -3,7 +3,7 @@ import React from 'react';
 const base = 'inline-flex items-center justify-center rounded-lg font-medium transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-offset-2';
 
 const variants = {
-  primary: 'bg-brand-primary text-white hover:bg-brand-primary/90 focus:ring-brand-primary/20 shadow-sm',
+  primary: 'bg-indigo-600 text-white hover:bg-indigo-700 focus:ring-indigo-500/20 shadow-sm',
   secondary: 'bg-slate-100 text-slate-900 hover:bg-slate-200 dark:bg-slate-800 dark:text-white dark:hover:bg-slate-700 focus:ring-slate-500/20 border border-slate-200 dark:border-slate-700',
   danger: 'bg-red-600 text-white hover:bg-red-700 focus:ring-red-500/20 shadow-sm',
   ghost: 'bg-transparent text-slate-700 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800 focus:ring-slate-500/20',

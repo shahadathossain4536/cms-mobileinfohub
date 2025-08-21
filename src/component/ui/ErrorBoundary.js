@@ -21,7 +21,7 @@ class ErrorBoundary extends React.Component {
         <div className="min-h-[40vh] flex items-center justify-center text-center">
           <div>
             <p className="text-lg font-semibold text-red-600 dark:text-red-400">Something went wrong.</p>
-            <button className="mt-4 px-4 h-10 rounded-md bg-brand-primary text-white" onClick={() => window.location.reload()}>Reload</button>
+            <button className="mt-4 px-4 h-10 rounded-md bg-indigo-600 text-white" onClick={() => window.location.reload()}>Reload</button>
           </div>
         </div>
       );
