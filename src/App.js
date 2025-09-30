@@ -21,6 +21,7 @@ import LoadingOverlay from './component/ui/LoadingOverlay';
 import PrivateRoute from './component/HOC/PrivateRoute';
 import { Toaster } from 'react-hot-toast';
 import AddDevicesTest from './Pages/AddDevicesTest/AddDevicesTest';
+import EditBrand from './Pages/EditBrand/EditBrand';
 
 function App() {
   console.log('App component is rendering...');
@@ -46,6 +47,7 @@ function App() {
             <Route path="add-brand-name" element={<AddBrandName />} />
             <Route path="all-brand-list" element={<AllBrandList />} />
             <Route path="update-device/:id" element={<UpdateDevice />} />
+            <Route path="edit-brand/:id" element={<EditBrand />} />
             <Route path="advertisement" element={<Advertisement />} />
             <Route path="news" element={<News />} />
             <Route path="blog" element={<Blog />} />

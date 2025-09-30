@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import axios from 'axios';
+import axios from '../../helpers/axios';
 import { toast } from 'react-hot-toast';
 import Card, { CardHeader, CardContent } from '../../component/ui/Card';
 import Button from '../../component/ui/Button';
@@ -31,19 +31,19 @@ const MyCreations = () => {
 
       // Fetch user's devices
       const devicesResponse = await axios.get(
-        `https://deviceinfohub-server.vercel.app/api/devicesData?createdBy=${user._id}`,
+        `devicesData?createdBy=${user._id}`,
         { headers }
       );
 
       // Fetch user's news
       const newsResponse = await axios.get(
-        `https://deviceinfohub-server.vercel.app/api/news?author=${user.email}`,
+        `news?author=${user.email}`,
         { headers }
       );
 
       // Fetch user's blogs
       const blogsResponse = await axios.get(
-        `https://deviceinfohub-server.vercel.app/api/blogs?author=${user.email}`,
+        `blogs?author=${user.email}`,
         { headers }
       );
 

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import axios from "axios";
+import axios from "../../helpers/axios";
+import axiosLib from "axios";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import StepFormSection from "../../component/StepFormSection/StepFormSection";
@@ -20,7 +21,7 @@ const UpdateDevice = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get("https://deviceinfohub-server.vercel.app/api/brandName");
+        const response = await axios.get("brandName");
 
         const formattedData = response.data.brandNames.map((brand) => ({
           label: brand.name,
@@ -38,9 +39,7 @@ const UpdateDevice = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get(
-          `https://deviceinfohub-server.vercel.app/api/devicesData/${id}`
-        );
+        const response = await axios.get(`devicesData/${id}`);
         const data = response.data;
         setDeviceDataOnly(data);
       } catch (error) {
@@ -204,7 +203,7 @@ const UpdateDevice = () => {
         const formData = new FormData();
         formData.append("image", selectedImage);
 
-        const response = await axios.post(
+        const response = await axiosLib.post(
           "https://api.imgbb.com/1/upload",
           formData,
           {
@@ -427,7 +426,7 @@ const UpdateDevice = () => {
       };
 
       const response = await axios.put(
-        `https://deviceinfohub-server.vercel.app/api/devicesData/${id}`,
+        `devicesData/${id}`,
         devicesData,
         {
           headers: {

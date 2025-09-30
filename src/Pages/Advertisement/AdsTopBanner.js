@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import { useForm, setValue } from "react-hook-form";
 import toast from "react-hot-toast";
-import axios from "axios";
+import axios from "../../helpers/axios";
+import axiosLib from "axios";
 
 const AdsTopBanner = () => {
   const {
@@ -63,7 +64,7 @@ const AdsTopBanner = () => {
     formData.append("image", file);
 
     try {
-      const response = await axios.post("https://api.imgbb.com/1/upload", formData);
+      const response = await axiosLib.post("https://api.imgbb.com/1/upload", formData);
       console.log("ssssssssssssssssssssss", response);
       if (response.data.success) {
         toast.success("Images uploaded successfully!");
@@ -108,7 +109,7 @@ const AdsTopBanner = () => {
             bannerOption,
             bannerItem: [...updatedPhotoLinks],
           }
-          const response = await axios.post("https://deviceinfohub-server.vercel.app/api/create-ads/topAds", data);
+          const response = await axios.post("create-ads/topAds", data);
 
           // Handle success
           console.log("Server response:", response.data);

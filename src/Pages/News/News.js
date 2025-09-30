@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+import axios from "../../helpers/axios";
 import toast from "react-hot-toast";
 import { useForm } from "react-hook-form";
 
@@ -33,12 +33,9 @@ const News = () => {
         ...filters
       });
 
-      const response = await axios.get(
-        `https://deviceinfohub-server.vercel.app/api/news?${params}`,
-        {
-          headers: { Authorization: `Bearer ${token}` }
-        }
-      );
+      const response = await axios.get(`news?${params}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
 
       // Check if response has the expected structure
       if (response.data && response.data.news) {
@@ -150,23 +147,15 @@ const News = () => {
 
       if (editingNews) {
         // Update existing news
-        await axios.put(
-          `https://deviceinfohub-server.vercel.app/api/news/${editingNews._id}`,
-          newsData,
-          {
-            headers: { Authorization: `Bearer ${token}` }
-          }
-        );
+        await axios.put(`news/${editingNews._id}`, newsData, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
         toast.success("News updated successfully");
       } else {
         // Create new news
-        await axios.post(
-          "https://deviceinfohub-server.vercel.app/api/news",
-          newsData,
-          {
-            headers: { Authorization: `Bearer ${token}` }
-          }
-        );
+        await axios.post("news", newsData, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
         toast.success("News created successfully");
       }
 
@@ -183,12 +172,9 @@ const News = () => {
     if (!window.confirm("Are you sure you want to delete this news?")) return;
 
     try {
-      await axios.delete(
-        `https://deviceinfohub-server.vercel.app/api/news/${id}`,
-        {
-          headers: { Authorization: `Bearer ${token}` }
-        }
-      );
+      await axios.delete(`news/${id}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
       toast.success("News deleted successfully");
       fetchNews(currentPage);
     } catch (error) {
@@ -207,13 +193,10 @@ const News = () => {
     if (!window.confirm(`Are you sure you want to delete ${selectedNews.length} selected news?`)) return;
 
     try {
-      await axios.delete(
-        "https://deviceinfohub-server.vercel.app/api/news",
-        {
-          data: { ids: selectedNews },
-          headers: { Authorization: `Bearer ${token}` }
-        }
-      );
+      await axios.delete("news", {
+        data: { ids: selectedNews },
+        headers: { Authorization: `Bearer ${token}` }
+      });
       toast.success(`${selectedNews.length} news deleted successfully`);
       setSelectedNews([]);
       setIsSelectAll(false);

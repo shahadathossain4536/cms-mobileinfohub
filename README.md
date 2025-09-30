@@ -68,3 +68,30 @@ This section has moved here: [https://facebook.github.io/create-react-app/docs/d
 ### `npm run build` fails to minify
 
 This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+
+## Environment configuration
+
+This app reads API base URL from `REACT_APP_API_BASE_URL` (fallback to `REACT_APP_API_URL`).
+
+- Create the following files in the project root:
+  - `.env.development`
+  - `.env.staging`
+  - `.env.production`
+
+Example contents:
+
+```
+REACT_APP_API_BASE_URL=http://localhost:5000/api
+```
+
+### Running with environments
+
+- Development (uses CRA default `.env.development` if present):
+  - `npm start` or `npm run start:dev`
+- Staging:
+  - `npm run start:staging`
+  - `npm run build:staging`
+- Production build with `.env.production`:
+  - `npm run build:prod`
+
+When neither `REACT_APP_API_BASE_URL` nor `REACT_APP_API_URL` is set, the app falls back to `https://deviceinfohub-server.vercel.app/api`.

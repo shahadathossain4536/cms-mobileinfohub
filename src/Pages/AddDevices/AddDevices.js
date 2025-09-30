@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios from "../../helpers/axios";
 import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import StepFormSection from "../../component/StepFormSection/StepFormSection";
@@ -149,7 +149,7 @@ const AddDevices = () => {
         const formData = new FormData();
         formData.append('image', selectedImage);
 
-        const response = await axios.post('https://api.imgbb.com/1/upload', formData, {
+        const response = await window.axios?.post?.('https://api.imgbb.com/1/upload', formData, {
           headers: {
             'Content-Type': 'multipart/form-data',
           },
@@ -204,7 +204,7 @@ const AddDevices = () => {
       const apiKey = process.env.REACT_APP_IMGBB_KEY;
 
       // Send DELETE request to ImgBB API
-      const response = await axios.delete(`https://api.imgbb.com/1/image/${deleteHash}?key=${apiKey}`);
+      const response = await window.axios?.delete?.(`https://api.imgbb.com/1/image/${deleteHash}?key=${apiKey}`);
 
       if (response.status === 200) {
         // Image deleted successfully, update your component state or take any necessary actions
@@ -251,7 +251,7 @@ const AddDevices = () => {
           const formData = new FormData();
           formData.append('image', photo);
 
-          const response = await fetch('https://api.imgbb.com/1/upload?key=' + apiKey, {
+        const response = await fetch('https://api.imgbb.com/1/upload?key=' + apiKey, {
             method: 'POST',
             body: formData,
           });
@@ -439,7 +439,7 @@ const AddDevices = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get("https://deviceinfohub-server.vercel.app/api/brandName");
+        const response = await axios.get("brandName");
 
         const formattedData = response.data.brandNames.map((brand) => ({
           label: brand.name,
@@ -495,7 +495,7 @@ const AddDevices = () => {
       
       console.log("devicesData", devicesData);
       
-      const response = await axios.post("https://deviceinfohub-server.vercel.app/api/devicesData", devicesData, {
+      const response = await axios.post("devicesData", devicesData, {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',

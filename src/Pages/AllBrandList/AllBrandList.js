@@ -33,11 +33,11 @@ const AllBrandList = () => {
               <p>Image</p>
             </div>
             <div className='w-[40%]'>
-              <p>Name</p>
+              <p>Brand Name</p>
             </div>
-            <div className='w-[20%]'>Brand</div>
-            <div className='w-[10%]'></div>
-            <div className='w-[10%]'></div>
+            <div className='w-[20%]'>Created Date</div>
+            <div className='w-[10%]'>Actions</div>
+            <div className='w-[10%]'>Actions</div>
           </div>
         </CardContent>
       </Card>
@@ -45,18 +45,41 @@ const AllBrandList = () => {
       {/* Render brand data */}
       <ul>
         {allBrandData && allBrandData.length > 0 ? (
-          allBrandData.map((device, index) => (
+          allBrandData.map((brand, index) => (
             <div className='flex w-full h-16 items-center my-2 px-4 border rounded-lg dark:border-slate-700 bg-white dark:bg-slate-800' key={index}>
-              <div className='w-[10%]'></div>
+              <div className='w-[10%]'>
+                {brand.brandBannerImg && (
+                  <img 
+                    src={brand.brandBannerImg} 
+                    alt={brand.name}
+                    className='w-8 h-8 object-cover rounded'
+                  />
+                )}
+              </div>
               <div className='w-[40%]'>
-                <p>{device.name}</p>
+                <p className='font-medium'>{brand.name}</p>
               </div>
-              <div className='w-[20%]'>{device.brand}</div>
-              <div className='w-[10%]'>
-                <Link to={`/dashboard/update-device/${device._id}`} className='inline-flex items-center justify-center h-10 w-20 rounded-md bg-green-600 text-white'>Edit</Link>
+              <div className='w-[20%]'>
+                <span className='text-sm text-gray-500 dark:text-gray-400'>
+                  {brand.createdAt ? new Date(brand.createdAt).toLocaleDateString() : 'N/A'}
+                </span>
               </div>
               <div className='w-[10%]'>
-                <Button variant='danger' onClick={() => handleBrandDelete(device._id)}>Delete</Button>
+                <Link 
+                  to={`/dashboard/edit-brand/${brand._id}`} 
+                  className='inline-flex items-center justify-center h-10 w-20 rounded-md bg-green-600 text-white hover:bg-green-700 transition-colors'
+                >
+                  Edit
+                </Link>
+              </div>
+              <div className='w-[10%]'>
+                <Button 
+                  variant='danger' 
+                  onClick={() => handleBrandDelete(brand._id)}
+                  className='h-10 w-20'
+                >
+                  Delete
+                </Button>
               </div>
             </div>
           ))

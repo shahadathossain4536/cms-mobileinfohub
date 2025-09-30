@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+import axios from "../../helpers/axios";
 import toast from "react-hot-toast";
 import { useForm } from "react-hook-form";
 
@@ -33,12 +33,9 @@ const Blog = () => {
         ...filters
       });
 
-      const response = await axios.get(
-        `https://deviceinfohub-server.vercel.app/api/blogs?${params}`,
-        {
-          headers: { Authorization: `Bearer ${token}` }
-        }
-      );
+      const response = await axios.get(`blogs?${params}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
 
       // Check if response has the expected structure
       if (response.data && response.data.blogs) {
@@ -150,23 +147,15 @@ const Blog = () => {
 
       if (editingBlog) {
         // Update existing blog
-        await axios.put(
-          `https://deviceinfohub-server.vercel.app/api/blogs/${editingBlog._id}`,
-          blogData,
-          {
-            headers: { Authorization: `Bearer ${token}` }
-          }
-        );
+        await axios.put(`blogs/${editingBlog._id}`, blogData, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
         toast.success("Blog updated successfully");
       } else {
         // Create new blog
-        await axios.post(
-          "https://deviceinfohub-server.vercel.app/api/blogs",
-          blogData,
-          {
-            headers: { Authorization: `Bearer ${token}` }
-          }
-        );
+        await axios.post("blogs", blogData, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
         toast.success("Blog created successfully");
       }
 
@@ -183,12 +172,9 @@ const Blog = () => {
     if (!window.confirm("Are you sure you want to delete this blog?")) return;
 
     try {
-      await axios.delete(
-        `https://deviceinfohub-server.vercel.app/api/blogs/${id}`,
-        {
-          headers: { Authorization: `Bearer ${token}` }
-        }
-      );
+      await axios.delete(`blogs/${id}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
       toast.success("Blog deleted successfully");
       fetchBlogs(currentPage);
     } catch (error) {
@@ -207,13 +193,10 @@ const Blog = () => {
     if (!window.confirm(`Are you sure you want to delete ${selectedBlogs.length} selected blogs?`)) return;
 
     try {
-      await axios.delete(
-        "https://deviceinfohub-server.vercel.app/api/blogs",
-        {
-          data: { ids: selectedBlogs },
-          headers: { Authorization: `Bearer ${token}` }
-        }
-      );
+      await axios.delete("blogs", {
+        data: { ids: selectedBlogs },
+        headers: { Authorization: `Bearer ${token}` }
+      });
       toast.success(`${selectedBlogs.length} blogs deleted successfully`);
       setSelectedBlogs([]);
       setIsSelectAll(false);
