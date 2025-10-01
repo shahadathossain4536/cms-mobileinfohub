@@ -3,11 +3,9 @@
   "deviceName": "Samsung Galaxy S24+",
   "release_date": "2024, January 24",
   "status": "Available",
-  "banner_img": "https://i.ibb.co/2kzGqw5/samsung-galaxy-s24-plus-5g-sm-s926.jpg",
+  "banner_img": "",
   "galleryPhoto": [
-    "https://i.ibb.co/HV9skTG/samsung-galaxy-s24-plus-5g-sm-s926-2.jpg",
-    "https://i.ibb.co/47q9dhH/samsung-galaxy-s24-plus-5g-sm-s926-3.jpg",
-    "https://i.ibb.co/HFLM1rX/samsung-galaxy-s24-plus-5g-sm-s926-1.jpg"
+ 
   ],
   "weight": "196g ",
   "backCamera": "50",

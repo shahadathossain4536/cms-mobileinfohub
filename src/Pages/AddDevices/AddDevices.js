@@ -19,52 +19,21 @@ const AddDevices = () => {
     handleSubmit,
     reset, // Import reset here
   } = useForm();
-  const [isClearable, setIsClearable] = useState(true);
-  const [isSearchable, setIsSearchable] = useState(true);
-  const [isDisabled, setIsDisabled] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [isRtl, setIsRtl] = useState(false);
   const [selectedOption, setSelectedOption] = useState("");
   const [brandOption, setBrandOption] = useState([]);
   const [selectedImage, setSelectedImage] = useState(null);
-  const [step, setStep] = useState(1);
   const [imagePreviewUrl, setImagePreviewUrl] = useState(null);
   const [photoGallery, setPhotoGallery] = useState([null]);
   console.log("photoGallery", photoGallery);
-  const [startDate, setStartDate] = useState(null);
   const [expandableStorageOption, setExpandableStorageOption] = useState("no");
-  const [isImageSelected, setIsImageSelected] = useState(false);
-  const [deleteButtonVisible, setDeleteButtonVisible] = useState(false);
-  const [imageDeleteHash, setImageDeleteHash] = useState(null);
-  const [bannerImage, setBannerImage] = useState(null);
-  const [uploadedPhotoUrls, setUploadedPhotoUrls] = useState([]);
   const [expandableStorageType, setExpandableStorageType] = useState("");
   const [backCameraNumber, setBackCameraNumber] = useState();
   const [frontCameraNumber, setFrontCameraNumber] = useState();
   const [showFormSection, setShowFormSection] = useState(false);
-  const [isUploadSuccessful, setIsUploadSuccessful] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [jsonFile, setJsonFile] = useState(null);
   const [isImageToJsonOpen, setIsImageToJsonOpen] = useState(false);
   const [isGsmarenaOpen, setIsGsmarenaOpen] = useState(false);
-  const steps = [
-    "Banner Data",
-    "Network",
-    "Launch",
-    "Body",
-    "Display",
-    "Platform",
-    "Memory",
-    "Main Camera",
-    "Selfie Camera",
-    "Sound",
-    "Comms",
-    "Features",
-    "Battery",
-    "Color",
-    "Price",
-    "Photo Gallery",
-  ];
 
   const openModal = () => {
     setIsModalOpen(true);
@@ -78,14 +47,6 @@ const AddDevices = () => {
   const closeImageToJson = () => setIsImageToJsonOpen(false);
   const openGsmarena = () => setIsGsmarenaOpen(true);
   const closeGsmarena = () => setIsGsmarenaOpen(false);
-
-  const handleJsonFileChange = (e) => {
-    const file = e.target.files[0];
-    setJsonFile(file);
-  };
-
-
-
 
 
   // Define the function to handle the Create button click
@@ -134,104 +95,10 @@ const AddDevices = () => {
       const updatedGallery = [...prevGallery];
       updatedGallery[index] = filesArray[0];
 
-      // Check if an image is selected
-      const hasImageSelected = updatedGallery.some((photo) => photo !== null);
-      setIsImageSelected(hasImageSelected);
-
       return updatedGallery;
     });
   };
 
-  const handleUploadButtonClick = async () => {
-    try {
-      // Check if an image is selected
-      if (selectedImage) {
-        const formData = new FormData();
-        formData.append('image', selectedImage);
-
-        const response = await window.axios?.post?.('https://api.imgbb.com/1/upload', formData, {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
-          params: {
-            key: process.env.REACT_APP_IMGBB_KEY,
-          },
-        });
-
-        if (response.data.status === 200) {
-          // Image uploaded successfully, get the deletehash
-          const deleteHash = response.data.data.delete_url;
-          const bannerImageRes = response.data.data.display_url;
-
-          // Now you can use this deletehash to delete the image later
-          console.log('Image uploaded successfully. Deletehash:', response.data);
-
-          // Show the delete button and store the deletehash in your component state
-          setDeleteButtonVisible(true);
-          setImageDeleteHash(deleteHash);
-          setBannerImage(bannerImageRes)
-
-          // Show success toast
-          toast.success('Image uploaded successfully');
-
-          // Set the upload status to true
-          setIsUploadSuccessful(true);
-        } else {
-          toast.error('Failed to upload image');
-        }
-      } else {
-        console.log('No image selected to upload.');
-        // Show error toast if no image selected
-        toast.error('Please select an image to upload.', { duration: 4000 });
-      }
-    } catch (error) {
-      console.error('Error uploading image to ImgBB:', error);
-
-      // Show error toast
-      toast.error('Error uploading image. Please try again later.', { duration: 4000 });
-      // Handle the error as needed
-    }
-  };
-
-  const handleDeleteButtonClick = async (deleteUrl) => {
-    console.log("deleteUrl-------------", deleteUrl);
-
-    try {
-      // Extract delete hash from the delete URL
-      const deleteHash = deleteUrl.split('/').pop();
-      console.log("deleteHash-------------", deleteHash);
-
-      const apiKey = process.env.REACT_APP_IMGBB_KEY;
-
-      // Send DELETE request to ImgBB API
-      const response = await window.axios?.delete?.(`https://api.imgbb.com/1/image/${deleteHash}?key=${apiKey}`);
-
-      if (response.status === 200) {
-        // Image deleted successfully, update your component state or take any necessary actions
-        toast.success('Image deleted successfully');
-        console.log("Image deleted successfully");
-      } else {
-        toast.error('Failed to delete image');
-        console.error("Failed to delete image:", response.data);
-      }
-    } catch (error) {
-      // Log detailed information about the error
-      console.error('Error deleting image:', error);
-
-      // Check if the error response is available
-      if (error.response) {
-        console.error("Error response from ImgBB API:", error.response.data);
-      } else if (error.request) {
-        // The request was made but no response was received
-        console.error("No response received from ImgBB API. Request details:", error.request);
-      } else {
-        // Something happened in setting up the request that triggered an Error
-        console.error("Error setting up the request:", error.message);
-      }
-
-      toast.error('Error deleting image. Check console for details.');
-    }
-  };
   const handleDeletePhoto = (index) => {
     setPhotoGallery((prevGallery) => {
       const updatedGallery = [...prevGallery];
@@ -242,42 +109,6 @@ const AddDevices = () => {
 
   const handleAddPhotoInput = () => {
     setPhotoGallery((prevGallery) => [...prevGallery, null]);
-  };
-  const galleryPhotoUpload = async () => {
-    const apiKey = process.env.REACT_APP_IMGBB_KEY;
-    try {
-      const uploadPromises = photoGallery.map(async (photo, index) => {
-        if (photo) {
-          const formData = new FormData();
-          formData.append('image', photo);
-
-        const response = await fetch('https://api.imgbb.com/1/upload?key=' + apiKey, {
-            method: 'POST',
-            body: formData,
-          });
-
-          const result = await response.json();
-
-          if (result.success) {
-            // Photo uploaded successfully, save the URL
-            setUploadedPhotoUrls((prevUrls) => [...prevUrls, result.data.url]);
-          } else {
-            // Photo upload failed, show an error toast
-            toast.error('Failed to upload photo');
-          }
-        }
-      });
-
-      // Wait for all uploads to complete
-      await Promise.all(uploadPromises);
-
-      // Show success toast after all uploads are complete
-      toast.success('All photos uploaded successfully');
-    } catch (error) {
-      // Handle any errors during the upload process
-      console.error('Error uploading photos:', error);
-      toast.error('Error uploading photos');
-    }
   };
   const [inputData, setInputData] = useState({
     network: [{ name: "Technology", subData: "" }],
@@ -369,8 +200,6 @@ const AddDevices = () => {
       });
 
       setSelectedOption(importedData.brand || "");
-      setBannerImage(importedData.banner_img);
-      setPhotoGallery(importedData.galleryPhoto || []);
       setExpandableStorageOption(importedData.expandable_storage || "no");
       setExpandableStorageType(importedData.expandable_storage_type || "");
 
@@ -378,9 +207,6 @@ const AddDevices = () => {
     }
   };
 
-
-  // Rest of your code remains unchanged...
-  const numberOfArrays = Object.keys(inputData).length;
 
   const handleCameraInput = (section, count = 1) => {
     const updatedData = { ...inputData };
@@ -458,47 +284,66 @@ const AddDevices = () => {
       // Show loading state
       setIsLoading(true);
       
+      // Validate banner image is selected
+      if (!selectedImage) {
+        toast.error('Please select a banner image.');
+        setIsLoading(false);
+        return;
+      }
+      
       // Generate href from deviceName
       const href = data.modelName
         .toLowerCase() // Convert to lowercase
         .replace(/\s+/g, '-') // Replace spaces with hyphens
         .replace(/[^a-z0-9-]/g, ''); // Remove any non-alphanumeric characters except hyphens
 
-      const devicesData = {
-        brand: `${selectedOption}`,
-        deviceName: `${data.modelName}`,
-        release_date: data.release_date,
-        href: href, // Set the generated href
-        status: data.status,
-        banner_img: bannerImage,
-        galleryPhoto: uploadedPhotoUrls,
-        weight: `${data.weight}`,
-        backCamera: `${data.backCamera}`,
-        backCameraVideo: `${data.backCameraVideo}`,
-        battery: `${data.battery}`,
-        chargingSpeed: `${data.chargingSpeed}`,
-        processor: `${data.processor}`,
-        thickness: `${data.thickness}`,
-        os_android: `${data.os_android}`,
-        os_brand: `${data.os_brand}`,
-        displaySize: `${data.displaySize}`,
-        displayResolution: `${data.displayResolution}`,
-        expandable_storage: expandableStorageOption,
-        expandable_storage_type: expandableStorageType,
-        ram: `${data.ram}`,
-        storage: `${data.storage}`,
-        data: Object.entries(inputData).map(([type, subType]) => ({
-          type,
-          subType,
-        })),
-      };
+      // Build FormData for multipart upload
+      const formData = new FormData();
       
-      console.log("devicesData", devicesData);
+      // Add text fields
+      formData.append('brand', selectedOption);
+      formData.append('deviceName', data.modelName);
+      formData.append('release_date', data.release_date || '');
+      formData.append('href', href);
+      formData.append('status', data.status);
+      formData.append('weight', data.weight || '');
+      formData.append('backCamera', data.backCamera || '');
+      formData.append('backCameraVideo', data.backCameraVideo || '');
+      formData.append('battery', data.battery || '');
+      formData.append('chargingSpeed', data.chargingSpeed || '');
+      formData.append('processor', data.processor || '');
+      formData.append('thickness', data.thickness || '');
+      formData.append('os_android', data.os_android || '');
+      formData.append('os_brand', data.os_brand || '');
+      formData.append('displaySize', data.displaySize || '');
+      formData.append('displayResolution', data.displayResolution || '');
+      formData.append('expandable_storage', expandableStorageOption);
+      formData.append('expandable_storage_type', expandableStorageType);
+      formData.append('ram', data.ram || '');
+      formData.append('storage', data.storage || '');
       
-      const response = await axios.post("devicesData", devicesData, {
+      // Add data array as JSON string
+      const dataArray = Object.entries(inputData).map(([type, subType]) => ({
+        type,
+        subType,
+      }));
+      formData.append('data', JSON.stringify(dataArray));
+      
+      // Add banner image file
+      formData.append('banner_img', selectedImage);
+      
+      // Add gallery photos (filter out null values)
+      const validPhotos = photoGallery.filter(photo => photo !== null);
+      validPhotos.forEach((photo) => {
+        formData.append('galleryPhoto', photo);
+      });
+      
+      console.log("Submitting device with files...");
+      
+      const response = await axios.post("devicesData", formData, {
         headers: {
           Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
+          'Content-Type': 'multipart/form-data',
         },
       });
       
@@ -507,12 +352,9 @@ const AddDevices = () => {
       
       // Reset form after successful submission
       reset();
-      setStep(1);
       setSelectedImage(null);
       setImagePreviewUrl(null);
-      setBannerImage(null);
       setPhotoGallery([null]);
-      setUploadedPhotoUrls([]);
       setInputData({
         network: [{ name: "Technology", subData: "" }],
         launch: [
@@ -575,21 +417,11 @@ const AddDevices = () => {
       
     } catch (error) {
       console.error("Error adding device:", error.response?.data);
-      toast.error('Error adding device. Please try again later.');
+      toast.error(error.response?.data?.error || 'Error adding device. Please try again later.');
     } finally {
       setIsLoading(false);
     }
   };
-
-// Event handler for Previous button mouse over
-const handlePreviousMouseOver = () => {
-  // Removed automatic step change on hover
-};
-
-// Event handler for Next button mouse over
-const handleNextMouseOver = () => {
-  // Removed automatic step change on hover
-};
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-950 dark:to-slate-900 py-8 px-4">
@@ -882,31 +714,9 @@ const handleNextMouseOver = () => {
                           src={imagePreviewUrl}
                           alt="Banner Preview"
                         />
-                      </div>
-                    )}
-
-                    {selectedImage && (
-                      <div className="space-y-3">
-                        <Button
-                          type="button"
-                          onClick={handleUploadButtonClick}
-                          disabled={isUploadSuccessful}
-                          className="w-full"
-                          loading={isUploadSuccessful}
-                        >
-                          {isUploadSuccessful ? 'Uploaded' : 'Upload to Server'}
-                        </Button>
-                        
-                        {deleteButtonVisible && (
-                          <Button
-                            type="button"
-                            variant='danger'
-                            className="w-full"
-                            onClick={() => handleDeleteButtonClick(imageDeleteHash)}
-                          >
-                            Delete Image
-                          </Button>
-                        )}
+                        <p className="text-sm text-slate-600 dark:text-slate-400 mt-2">
+                          Image ready to upload
+                        </p>
                       </div>
                     )}
                   </div>
@@ -1263,20 +1073,16 @@ const handleNextMouseOver = () => {
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                     </svg>
-                    Add Photo
+                    Add Photo Slot
                   </Button>
                   
                   {photoGallery.some(photo => photo) && (
-                    <Button
-                      type="button"
-                      onClick={galleryPhotoUpload}
-                      className="flex items-center gap-2"
-                    >
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6H16a5 5 0 011 9.9M15 13l-3-3-3 3m3-3v12" />
+                    <p className="text-sm text-slate-600 dark:text-slate-400 flex items-center">
+                      <svg className="w-4 h-4 mr-1 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                       </svg>
-                      Upload All Photos
-                    </Button>
+                      {photoGallery.filter(p => p).length} photo(s) ready to upload
+                    </p>
                   )}
                 </div>
               </div>
