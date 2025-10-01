@@ -11,6 +11,8 @@ import AllDeviceList from './Pages/AllDeviceList/AllDeviceList';
 import AllBrandList from './Pages/AllBrandList/AllBrandList';
 import UpdateDevice from './Pages/UpdateDevice/UpdateDevice';
 import Advertisement from './Pages/Advertisement/Advertisement';
+import MyAdvertisements from './Pages/Advertisement/MyAdvertisements';
+import AdminAdvertisements from './Pages/Advertisement/AdminAdvertisements';
 import Devices from './Pages/Devices/Devices';
 import News from './Pages/News/News';
 import Blog from './Pages/Blog/Blog';
@@ -49,6 +51,8 @@ function App() {
             <Route path="update-device/:id" element={<UpdateDevice />} />
             <Route path="edit-brand/:id" element={<EditBrand />} />
             <Route path="advertisement" element={<Advertisement />} />
+            <Route path="my-advertisements" element={<MyAdvertisements />} />
+            <Route path="admin-advertisements" element={<AdminAdvertisements />} />
             <Route path="news" element={<News />} />
             <Route path="blog" element={<Blog />} />
             <Route path="my-creations" element={<MyCreations />} />
