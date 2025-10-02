@@ -54,7 +54,7 @@ const VideoAdvertisement = ({ placement, onCostChange }) => {
     setIsUploading(true);
     try {
       const advertisementData = {
-        title: data.title.trim(),
+        title: data.title?.trim() || `Advertisement ${Date.now()}`,
         type: 'video',
         placement: {
           category: placement,
@@ -62,7 +62,8 @@ const VideoAdvertisement = ({ placement, onCostChange }) => {
         },
         content: {
           mediaUrl: uploadedVideo.url,
-          mediaType: 'video'
+          mediaType: 'video',
+          linkUrl: data.linkUrl || ''
         },
         schedule: {
           startDate: new Date(data.startDate),
@@ -121,15 +122,14 @@ const VideoAdvertisement = ({ placement, onCostChange }) => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Advertisement Title *
+                  Advertisement Title
                 </label>
                 <input
                   {...register('title', { 
-                    required: 'Title is required',
                     minLength: { value: 3, message: 'Title must be at least 3 characters' },
                     maxLength: { value: 100, message: 'Title cannot exceed 100 characters' }
                   })}
-                  placeholder="Enter advertisement title"
+                  placeholder="Enter advertisement title (optional)"
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 />
                 {errors.title && (
@@ -169,6 +169,26 @@ const VideoAdvertisement = ({ placement, onCostChange }) => {
                 />
                 {errors.duration && (
                   <p className="mt-1 text-sm text-red-600">{errors.duration.message}</p>
+                )}
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Link URL
+                </label>
+                <input
+                  type="url"
+                  {...register('linkUrl', { 
+                    pattern: { 
+                      value: /^https?:\/\/.+/,
+                      message: 'Please enter a valid URL starting with http:// or https://'
+                    }
+                  })}
+                  placeholder="https://example.com (optional)"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                />
+                {errors.linkUrl && (
+                  <p className="mt-1 text-sm text-red-600">{errors.linkUrl.message}</p>
                 )}
               </div>
             </div>
@@ -371,7 +391,7 @@ const VideoAdvertisement = ({ placement, onCostChange }) => {
           )}
 
           {/* Form Status */}
-          {(!uploadedVideo || !watchedTitle || !watchedDuration) && (
+          {(!uploadedVideo || !watchedDuration) && (
             <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
               <div className="flex items-start">
                 <div className="text-yellow-600 mr-3 mt-0.5">⚠️</div>
@@ -379,7 +399,6 @@ const VideoAdvertisement = ({ placement, onCostChange }) => {
                   <h4 className="text-sm font-medium text-yellow-800">Complete the form to create advertisement</h4>
                   <ul className="text-xs text-yellow-700 mt-1 space-y-1">
                     {!uploadedVideo && <li>• Upload a video</li>}
-                    {!watchedTitle && <li>• Enter advertisement title</li>}
                     {!watchedDuration && <li>• Set duration (days)</li>}
                   </ul>
                 </div>
@@ -390,7 +409,7 @@ const VideoAdvertisement = ({ placement, onCostChange }) => {
           {/* Submit Button */}
           <div className="flex justify-between items-center pt-6 border-t border-gray-200">
             <div className="text-sm text-gray-500">
-              {uploadedVideo && watchedTitle && watchedDuration ? (
+              {uploadedVideo && watchedDuration ? (
                 <span className="text-green-600">✅ Ready to create advertisement</span>
               ) : (
                 <span>Fill all required fields to enable submission</span>
@@ -410,11 +429,10 @@ const VideoAdvertisement = ({ placement, onCostChange }) => {
               </button>
               <button
                 type="submit"
-                disabled={isUploading || !uploadedVideo || !watchedTitle || !watchedDuration}
+                disabled={isUploading || !uploadedVideo || !watchedDuration}
                 className="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 title={
                   !uploadedVideo ? 'Please upload a video' :
-                  !watchedTitle ? 'Please enter a title' :
                   !watchedDuration ? 'Please enter duration' :
                   'Ready to create advertisement'
                 }

@@ -40,9 +40,7 @@ export const getCategoryDisplayName = (category) => {
 export const validateAdvertisementData = (data, type) => {
   const errors = [];
 
-  if (!data.title || data.title.trim().length === 0) {
-    errors.push('Advertisement title is required');
-  }
+  // Title is now optional - no validation needed
 
   if (!data.duration || data.duration < 1) {
     errors.push('Duration must be at least 1 day');

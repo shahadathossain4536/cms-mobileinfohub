@@ -78,7 +78,7 @@ const MixedMediaSlider = ({ placement, onCostChange }) => {
       }));
 
       const advertisementData = {
-        title: data.title.trim(),
+        title: data.title?.trim() || `Advertisement ${Date.now()}`,
         type: 'slider',
         placement: {
           category: placement,
@@ -144,15 +144,14 @@ const MixedMediaSlider = ({ placement, onCostChange }) => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Advertisement Title *
+                  Advertisement Title
                 </label>
                 <input
                   {...register('title', { 
-                    required: 'Title is required',
                     minLength: { value: 3, message: 'Title must be at least 3 characters' },
                     maxLength: { value: 100, message: 'Title cannot exceed 100 characters' }
                   })}
-                  placeholder="Enter advertisement title"
+                  placeholder="Enter advertisement title (optional)"
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 />
                 {errors.title && (
@@ -507,7 +506,7 @@ const MixedMediaSlider = ({ placement, onCostChange }) => {
           )}
 
           {/* Form Status */}
-          {(uploadedMedia.length === 0 || !watchedTitle || !watchedDuration) && (
+          {(uploadedMedia.length === 0 || !watchedDuration) && (
             <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
               <div className="flex items-start">
                 <div className="text-yellow-600 mr-3 mt-0.5">⚠️</div>
@@ -515,7 +514,6 @@ const MixedMediaSlider = ({ placement, onCostChange }) => {
                   <h4 className="text-sm font-medium text-yellow-800">Complete the form to create advertisement</h4>
                   <ul className="text-xs text-yellow-700 mt-1 space-y-1">
                     {uploadedMedia.length === 0 && <li>• Upload at least one media file</li>}
-                    {!watchedTitle && <li>• Enter advertisement title</li>}
                     {!watchedDuration && <li>• Set duration (days)</li>}
                   </ul>
                 </div>
@@ -526,7 +524,7 @@ const MixedMediaSlider = ({ placement, onCostChange }) => {
           {/* Submit Button */}
           <div className="flex justify-between items-center pt-6 border-t border-gray-200">
             <div className="text-sm text-gray-500">
-              {uploadedMedia.length > 0 && watchedTitle && watchedDuration ? (
+              {uploadedMedia.length > 0 && watchedDuration ? (
                 <span className="text-green-600">✅ Ready to create advertisement</span>
               ) : (
                 <span>Fill all required fields to enable submission</span>
@@ -546,11 +544,10 @@ const MixedMediaSlider = ({ placement, onCostChange }) => {
               </button>
               <button
                 type="submit"
-                disabled={isUploading || uploadedMedia.length === 0 || !watchedTitle || !watchedDuration}
+                disabled={isUploading || uploadedMedia.length === 0 || !watchedDuration}
                 className="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 title={
                   uploadedMedia.length === 0 ? 'Please upload at least one media file' :
-                  !watchedTitle ? 'Please enter a title' :
                   !watchedDuration ? 'Please enter duration' :
                   'Ready to create advertisement'
                 }
