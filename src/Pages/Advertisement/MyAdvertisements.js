@@ -60,11 +60,7 @@ const MyAdvertisements = () => {
 
     setDeletingId(adId);
     try {
-      const apiUrl = process.env.NODE_ENV === 'development' 
-        ? 'http://localhost:2000/api' 
-        : 'https://deviceinfohub-server.vercel.app/api';
-      
-      await axios.delete(`${apiUrl}/advertisements/${adId}`);
+      await axios.delete(`/advertisements/${adId}`);
       toast.success('Advertisement deleted successfully!');
       fetchMyAdvertisements(); // Refresh list
     } catch (error) {
@@ -82,11 +78,7 @@ const MyAdvertisements = () => {
 
     setStoppingId(adId);
     try {
-      const apiUrl = process.env.NODE_ENV === 'development' 
-        ? 'http://localhost:2000/api' 
-        : 'https://deviceinfohub-server.vercel.app/api';
-      
-      await axios.put(`${apiUrl}/advertisements/${adId}/stop`);
+      await axios.put(`/advertisements/${adId}/stop`);
       toast.success('Advertisement stopped successfully!');
       fetchMyAdvertisements(); // Refresh list
     } catch (error) {
@@ -99,11 +91,7 @@ const MyAdvertisements = () => {
 
   const handleApproveAd = async (adId) => {
     try {
-      const apiUrl = process.env.NODE_ENV === 'development' 
-        ? 'http://localhost:2000/api' 
-        : 'https://deviceinfohub-server.vercel.app/api';
-      
-      await axios.put(`${apiUrl}/advertisements/${adId}/approve`);
+      await axios.put(`/advertisements/${adId}/approve`);
       toast.success('Advertisement approved successfully!');
       fetchMyAdvertisements(); // Refresh list
     } catch (error) {
@@ -117,11 +105,7 @@ const MyAdvertisements = () => {
     if (!reason) return;
 
     try {
-      const apiUrl = process.env.NODE_ENV === 'development' 
-        ? 'http://localhost:2000/api' 
-        : 'https://deviceinfohub-server.vercel.app/api';
-      
-      await axios.put(`${apiUrl}/advertisements/${adId}/reject`, {
+      await axios.put(`/advertisements/${adId}/reject`, {
         rejectionReason: reason
       });
       toast.success('Advertisement rejected');
@@ -134,11 +118,7 @@ const MyAdvertisements = () => {
 
   const handleActivateAd = async (adId) => {
     try {
-      const apiUrl = process.env.NODE_ENV === 'development' 
-        ? 'http://localhost:2000/api' 
-        : 'https://deviceinfohub-server.vercel.app/api';
-      
-      await axios.put(`${apiUrl}/advertisements/${adId}/status`, {
+      await axios.put(`/advertisements/${adId}/status`, {
         status: 'active'
       });
       toast.success('Advertisement activated successfully!');

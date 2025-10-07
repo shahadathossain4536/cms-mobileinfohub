@@ -29,9 +29,9 @@ const MyCreations = () => {
 
       const headers = { Authorization: `Bearer ${token}` };
 
-      // Fetch user's devices
+      // Fetch user's devices (including hidden ones)
       const devicesResponse = await axios.get(
-        `devicesData?createdBy=${user._id}`,
+        `devicesData?createdBy=${user._id}&includeHidden=true`,
         { headers }
       );
 

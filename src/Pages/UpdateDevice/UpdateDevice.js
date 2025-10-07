@@ -5,11 +5,16 @@ import axiosLib from "axios";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import StepFormSection from "../../component/StepFormSection/StepFormSection";
-import Select from "react-select";
+import SelectUI from "../../component/ui/Select";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
 const UpdateDevice = () => {
+  // Helper function to generate unique IDs (moved to top to avoid hoisting issues)
+  const generateId = () => {
+    return Math.random().toString(36).substr(2, 9);
+  };
+
   const { id } = useParams();
   const token = window.localStorage.getItem("token");
   const {
@@ -21,9 +26,9 @@ const UpdateDevice = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get("brandName");
+        const response = await axios.get("brandName?limit=100");
 
-        const formattedData = response.data.brandNames.map((brand) => ({
+        const formattedData = (response.data?.brandNames || []).map((brand) => ({
           label: brand.name,
           value: brand.name,
         }));
@@ -56,8 +61,8 @@ const UpdateDevice = () => {
   const [isDisabled, setIsDisabled] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isRtl, setIsRtl] = useState(false);
-  const [selectedOption, setSelectedOption] = useState(null);
-  const [brandOption, setBrandOption] = useState([]);
+  const [selectedOption, setSelectedOption] = useState("");
+  const [brandOption, setBrandOption] = useState([]); // [{label, value}]
   const [selectedImage, setSelectedImage] = useState(null);
   const [imagePreviewUrl, setImagePreviewUrl] = useState();
   const [photoGallery, setPhotoGallery] = useState([null]);
@@ -76,13 +81,25 @@ const UpdateDevice = () => {
   const [isBannerDragActive, setIsBannerDragActive] = useState(false);
   const [galleryDragIndex, setGalleryDragIndex] = useState(null);
 
-  useEffect(() => {
-    const matchedOption = brandOption.find(
-      (option) => option.label === deviceDataOnly?.brand
-    );
+  // New state for storage variants
+  const [storageVariants, setStorageVariants] = useState([
+    {
+      variantId: generateId(),
+      rom: "",
+      ram: "",
+      price: "",
+      currency: "BDT",
+      availability: "Available"
+    }
+  ]);
 
-    if (matchedOption) {
-      setSelectedOption(matchedOption);
+  // New state for web visibility
+  const [webVisibility, setWebVisibility] = useState(true);
+
+  useEffect(() => {
+    // Initialize selected brand to string value to match AddDevices UI
+    if (deviceDataOnly?.brand) {
+      setSelectedOption(deviceDataOnly.brand);
     }
     
     // Set the banner_img for image preview
@@ -97,6 +114,98 @@ const UpdateDevice = () => {
     }
     if (deviceDataOnly && deviceDataOnly?.galleryPhoto) {
       setPhotoGallery(deviceDataOnly?.galleryPhoto);
+    }
+
+    // Helper to parse ROM/RAM pairs from a label like "128GB + 8GB"
+    const parseRomRamFromName = (name) => {
+      if (!name || typeof name !== 'string') return null;
+      const romMatch = name.match(/(\d+(?:\.\d+)?)\s*(GB|TB)/i);
+      const ramMatch = name.match(/(\d+(?:\.\d+)?)\s*GB/i);
+      if (romMatch && ramMatch) {
+        const rom = `${romMatch[1]}${romMatch[2].toUpperCase()}`;
+        const ram = `${ramMatch[1]}GB`;
+        return { rom, ram };
+      }
+      return null;
+    };
+
+    // Fallback: derive storageVariants from price or memory sections when missing/empty
+    const deriveVariantsFromData = (device) => {
+      if (!device || !Array.isArray(device.data)) return [];
+      // Prefer price section if present
+      const priceSection = device.data.find((s) => s.type === 'price');
+      if (priceSection && Array.isArray(priceSection.subType)) {
+        const variants = priceSection.subType
+          .map((item) => {
+            const parsed = parseRomRamFromName(item?.name);
+            if (!parsed) return null;
+            return {
+              variantId: item?.variantId || generateId(),
+              rom: parsed.rom,
+              ram: parsed.ram,
+              price: item?.subData || '',
+              currency: 'BDT',
+              availability: 'Available',
+            };
+          })
+          .filter(Boolean);
+        if (variants.length > 0) return variants;
+      }
+      // Fallback to memory->Internal line parsing if price not available
+      const memorySection = device.data.find((s) => s.type === 'memory');
+      if (memorySection && Array.isArray(memorySection.subType)) {
+        const internal = memorySection.subType.find((i) =>
+          typeof i?.name === 'string' && i.name.toLowerCase().includes('internal')
+        );
+        const internalText = internal?.subData || '';
+        if (internalText) {
+          const parts = internalText
+            .split(',')
+            .map((p) => p.trim())
+            .filter((p) => p.length > 0);
+          const variants = parts
+            .map((chunk) => {
+              const romMatch = chunk.match(/(\d+(?:\.\d+)?)\s*(GB|TB)/i);
+              const ramMatch = chunk.match(/(\d+(?:\.\d+)?)\s*GB\s*RAM/i);
+              if (romMatch && ramMatch) {
+                return {
+                  variantId: generateId(),
+                  rom: `${romMatch[1]}${romMatch[2].toUpperCase()}`,
+                  ram: `${ramMatch[1]}GB`,
+                  price: '',
+                  currency: 'BDT',
+                  availability: 'Available',
+                };
+              }
+              return null;
+            })
+            .filter(Boolean);
+          return variants;
+        }
+      }
+      return [];
+    };
+
+    // Handle storage variants with robust fallback
+    if (deviceDataOnly) {
+      if (Array.isArray(deviceDataOnly.storageVariants) && deviceDataOnly.storageVariants.length > 0) {
+        setStorageVariants(
+          deviceDataOnly.storageVariants.map((variant) => ({
+            ...variant,
+            variantId: variant.variantId || generateId(),
+          }))
+        );
+      } else {
+        const derived = deriveVariantsFromData(deviceDataOnly);
+        if (derived.length > 0) {
+          setStorageVariants(derived);
+        }
+      }
+    }
+
+    // Handle web visibility
+    if (deviceDataOnly && deviceDataOnly.webVisibility !== undefined) {
+      setWebVisibility(deviceDataOnly.webVisibility);
     }
 
     // Initialize inputData with existing device data
@@ -395,11 +504,41 @@ const UpdateDevice = () => {
     }
   };
 
+  // New handler functions for storage variants
+  const handleAddStorageVariant = () => {
+    const newVariant = {
+      variantId: generateId(),
+      rom: "",
+      ram: "",
+      price: "",
+      currency: "BDT",
+      availability: "Available"
+    };
+    setStorageVariants([...storageVariants, newVariant]);
+  };
+
+  const handleRemoveStorageVariant = (variantId) => {
+    setStorageVariants(storageVariants.filter(v => v.variantId !== variantId));
+  };
+
+  const handleUpdateStorageVariant = (variantId, field, value) => {
+    setStorageVariants(storageVariants.map(v => 
+      v.variantId === variantId ? { ...v, [field]: value } : v
+    ));
+  };
+
+  // Note: Price inputs will be auto-generated by backend based on storage variants
+
+  // Handle web visibility toggle
+  const handleWebVisibilityChange = (value) => {
+    setWebVisibility(value);
+  };
+
   const onSubmit = async (data) => {
     try {
       setIsLoading(true);
       const devicesData = {
-        brand: selectedOption?.label,
+        brand: selectedOption,
         deviceName: data.modelName || deviceDataOnly?.deviceName,
         release_date: data.release_date || deviceDataOnly?.release_date,
         banner_img: bannerImage || imagePreviewUrl,
@@ -419,6 +558,8 @@ const UpdateDevice = () => {
         expandable_storage_type: data.expandable_storage_type || deviceDataOnly?.expandable_storage_type,
         ram: data.ram || deviceDataOnly?.ram,
         storage: data.storage || deviceDataOnly?.storage,
+        webVisibility: webVisibility,
+        storageVariants: storageVariants,
         data: Object.entries(inputData).map(([type, subType]) => ({
           type,
           subType,
@@ -489,28 +630,17 @@ const UpdateDevice = () => {
                 <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
                   Brand Name
                 </label>
-                <Select
+                <SelectUI 
                   className="basic-single"
-                  classNamePrefix="select"
-                  isDisabled={isDisabled}
-                  isLoading={isLoading}
-                  isClearable={isClearable}
-                  isRtl={isRtl}
-                  isSearchable={isSearchable}
-                  name="brand"
+                  id="brand"
                   value={selectedOption}
-                  options={brandOption}
-                  onChange={setSelectedOption}
-                  styles={{
-                    control: (provided) => ({
-                      ...provided,
-                      backgroundColor: 'white',
-                      borderColor: '#cbd5e1',
-                      borderRadius: '0.5rem',
-                      minHeight: '48px',
-                    }),
-                  }}
-                />
+                  onChange={(e) => setSelectedOption(e.target.value)}
+                >
+                  <option value="">Select brand</option>
+                  {brandOption.map((b) => (
+                    <option key={b.value} value={b.value}>{b.label}</option>
+                  ))}
+                </SelectUI>
               </div>
 
               {/* Model Name */}
@@ -768,6 +898,56 @@ const UpdateDevice = () => {
             </div>
           </div>
 
+          {/* Web Visibility Section */}
+          <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-700 p-8">
+            <div className="mb-6">
+              <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">
+                Web Visibility Settings
+              </h2>
+              <p className="text-slate-600 dark:text-slate-400">
+                Control whether this device appears on the public website
+              </p>
+            </div>
+            
+            <div className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-700 rounded-lg border">
+              <div>
+                <h4 className="font-medium text-slate-900 dark:text-white">Show on Website</h4>
+                <p className="text-sm text-slate-600 dark:text-slate-400">
+                  Control whether this device appears on the public website
+                </p>
+              </div>
+              <div className="flex items-center">
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={webVisibility}
+                    onChange={(e) => handleWebVisibilityChange(e.target.checked)}
+                    className="sr-only peer"
+                  />
+                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
+                  <span className="ml-3 text-sm font-medium text-slate-900 dark:text-white">
+                    {webVisibility ? 'Visible' : 'Hidden'}
+                  </span>
+                </label>
+              </div>
+            </div>
+            
+            {!webVisibility && (
+              <div className="mt-4 p-3 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
+                <div className="flex">
+                  <svg className="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                  </svg>
+                  <div className="ml-3">
+                    <p className="text-sm text-yellow-800 dark:text-yellow-200">
+                      This device will be hidden from the public website but will remain accessible in the admin panel.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+
           {/* Device Banner Image */}
           <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-700 p-8">
             <div className="mb-6">
@@ -1005,13 +1185,98 @@ const UpdateDevice = () => {
               handleDeleteInput={handleDeleteInput}
               handleAddInput={handleAddInput}
             />
-            <StepFormSection
-              sectionName="price"
-              sectionData={inputData.price}
-              handleInputChange={handleInputChange}
-              handleDeleteInput={handleDeleteInput}
-              handleAddInput={handleAddInput}
-            />
+            {/* Price section removed - auto-generated by backend from storageVariants */}
+          </div>
+
+          {/* Storage Variants Section */}
+          <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-700 p-8">
+            <div className="mb-6">
+              <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">
+                Memory & Storage Variants
+              </h2>
+              <p className="text-slate-600 dark:text-slate-400">
+                Manage multiple ROM+RAM combinations with individual pricing
+              </p>
+            </div>
+            
+            {/* Dynamic variant inputs */}
+            {storageVariants.map((variant, index) => (
+              <div key={variant.variantId} className="mb-4 p-4 bg-slate-50 dark:bg-slate-700 rounded-lg border">
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                      ROM
+                    </label>
+                    <input
+                      className="w-full h-12 px-4 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                      placeholder="e.g., 64GB"
+                      value={variant.rom}
+                      onChange={(e) => handleUpdateStorageVariant(variant.variantId, 'rom', e.target.value)}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                      RAM
+                    </label>
+                    <input
+                      className="w-full h-12 px-4 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                      placeholder="e.g., 4GB"
+                      value={variant.ram}
+                      onChange={(e) => handleUpdateStorageVariant(variant.variantId, 'ram', e.target.value)}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                      Price
+                    </label>
+                    <input
+                      className="w-full h-12 px-4 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                      placeholder="e.g., 25000 BDT"
+                      value={variant.price}
+                      onChange={(e) => handleUpdateStorageVariant(variant.variantId, 'price', e.target.value)}
+                    />
+                  </div>
+                  <div className="flex items-end gap-2">
+                    <div className="flex-1">
+                      <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                        Availability
+                      </label>
+                      <select
+                        className="w-full h-12 px-4 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                        value={variant.availability}
+                        onChange={(e) => handleUpdateStorageVariant(variant.variantId, 'availability', e.target.value)}
+                      >
+                        <option value="Available">Available</option>
+                        <option value="Coming Soon">Coming Soon</option>
+                        <option value="Discontinued">Discontinued</option>
+                      </select>
+                    </div>
+                    {storageVariants.length > 1 && (
+                      <button
+                        type="button"
+                        className="px-3 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-medium transition-colors"
+                        onClick={() => handleRemoveStorageVariant(variant.variantId)}
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                      </button>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ))}
+            
+            <button
+              type="button"
+              className="w-full h-12 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-medium transition-colors"
+              onClick={handleAddStorageVariant}
+            >
+              <svg className="w-4 h-4 mr-2 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+              </svg>
+              Add Storage Variant
+            </button>
           </div>
 
           {/* Photo Gallery */}

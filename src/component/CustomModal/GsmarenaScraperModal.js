@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState, useRef } from "react";
-import axios from "axios";
+import axios from "../../helpers/axios";
 import toast from "react-hot-toast";
 
 const GsmarenaScraperModal = ({ isOpen, onClose }) => {
@@ -111,7 +111,7 @@ const GsmarenaScraperModal = ({ isOpen, onClose }) => {
       setAutoPauseCountdown(0);
 
       const res = await axios.post(
-        "https://deviceinfohub-server.vercel.app/api/scraper/gsmarena-device-link-list",
+        "/scraper/gsmarena-device-link-list",
         { url: brandUrl },
         { headers: { "Content-Type": "application/json" } }
       );
@@ -171,7 +171,7 @@ const GsmarenaScraperModal = ({ isOpen, onClose }) => {
       try {
         updateItemStatus(link, "scraping", "Scraping device page...");
         const scrapeRes = await axios.post(
-          "https://deviceinfohub-server.vercel.app/api/scraper/scrape-gsmarena",
+          "/scraper/scrape-gsmarena",
           { url: link },
           { headers: { "Content-Type": "application/json" } }
         );
@@ -181,7 +181,7 @@ const GsmarenaScraperModal = ({ isOpen, onClose }) => {
 
         updateItemStatus(link, "importing", "Importing to server...");
         await axios.post(
-          "https://deviceinfohub-server.vercel.app/api/devicesData",
+          "/devicesData",
           payload,
           {
             headers: {

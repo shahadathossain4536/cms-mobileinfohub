@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import axiosInstance from '../../helpers/axios';
 import { Link } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import Loading from '../../component/ui/Loading';
@@ -12,29 +13,66 @@ import Table, { THead, TBody, TR, TH, TD } from '../../component/ui/Table';
 import { useDevices, useDeleteDevice } from '../../helpers/queries/deviceQueries';
 
 const AllDeviceList = () => {
-  const { data: devicesData, isLoading, isError, refetch } = useDevices();
-  const deleteDeviceMutation = useDeleteDevice();
-  const allDeviceData = devicesData || [];
-  
+  const [brandFilter, setBrandFilter] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [totalPages, setTotalPages] = useState(0);
+  const { data: devicesResponse, isLoading, isError, refetch } = useDevices({ page: currentPage, limit: itemsPerPage, brand: brandFilter || undefined });
+  const devicesData = devicesResponse?.data || [];
+  const serverPagination = devicesResponse?.pagination;
+  const deleteDeviceMutation = useDeleteDevice();
+  const allDeviceData = devicesData || [];
+  
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [deleteId, setDeleteId] = useState(null);
   const [selectedDevices, setSelectedDevices] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
+  const [showHidden, setShowHidden] = useState(true);
+  const [brandOptions, setBrandOptions] = useState([]);
+  const [brandsLoading, setBrandsLoading] = useState(false);
 
-  // Filter devices based on search term
-  const filteredDevices = allDeviceData.filter(device =>
-    device.deviceName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    device.brand.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  // Filter devices based on search term and visibility
+  const filteredDevices = allDeviceData.filter(device => {
+    const matchesSearch = device.deviceName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      device.brand.toLowerCase().includes(searchTerm.toLowerCase());
+    
+    const matchesVisibility = showHidden || device.webVisibility !== false;
+    
+    return matchesSearch && matchesVisibility;
+  });
 
   useEffect(() => {
-    if (filteredDevices?.length != null) {
+    if (serverPagination?.totalPages != null) {
+      setTotalPages(serverPagination.totalPages);
+    } else if (filteredDevices?.length != null) {
       setTotalPages(Math.ceil(filteredDevices.length / itemsPerPage));
     }
-  }, [filteredDevices, itemsPerPage]);
+  }, [serverPagination, filteredDevices, itemsPerPage]);
+
+  // Fetch brand list (limit 100) for dropdown filter
+  useEffect(() => {
+    const fetchBrands = async () => {
+      try {
+        setBrandsLoading(true);
+        const res = await axiosInstance.get('/brandName?limit=100');
+        const data = res.data;
+        let brands = [];
+        if (data && Array.isArray(data.brandNames)) {
+          brands = data.brandNames.map((b) => b.name);
+        } else if (Array.isArray(data)) {
+          brands = data.map((b) => b.name || b);
+        }
+        // de-duplicate and sort
+        const uniqueSorted = Array.from(new Set(brands.filter(Boolean))).sort((a, b) => a.localeCompare(b));
+        setBrandOptions(uniqueSorted);
+      } catch (e) {
+        setBrandOptions([]);
+      } finally {
+        setBrandsLoading(false);
+      }
+    };
+    fetchBrands();
+  }, []);
 
   const openModal = (id) => {
     setDeleteId(id);
@@ -74,7 +112,7 @@ const AllDeviceList = () => {
 
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = filteredDevices.slice(indexOfFirstItem, indexOfLastItem);
+  const currentItems = filteredDevices;
 
   const handlePageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
@@ -119,7 +157,7 @@ const AllDeviceList = () => {
     return (
       <div className='flex items-center justify-between mt-6'>
         <div className='text-sm text-slate-600 dark:text-slate-400'>
-          Showing {indexOfFirstItem + 1} to {Math.min(indexOfLastItem, filteredDevices.length)} of {filteredDevices.length} results
+          Page {serverPagination?.page || currentPage} of {serverPagination?.totalPages || totalPages} — {serverPagination?.total || filteredDevices.length} results
         </div>
         
         <div className='flex items-center gap-2'>
@@ -202,6 +240,30 @@ const AllDeviceList = () => {
                 <option value={50}>50 per page</option>
                 <option value={100}>100 per page</option>
               </select>
+              <select
+                value={brandFilter}
+                onChange={(e) => { setBrandFilter(e.target.value); setCurrentPage(1); }}
+                className="ml-3 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-slate-900 dark:text-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-primary/20 focus:border-brand-primary"
+              >
+                <option value="">All brands</option>
+                {brandsLoading ? (
+                  <option>Loading...</option>
+                ) : (
+                  brandOptions.map((name) => (
+                    <option key={name} value={name}>{name}</option>
+                  ))
+                )}
+              </select>
+              
+              <label className='flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400'>
+                <input
+                  type="checkbox"
+                  checked={showHidden}
+                  onChange={(e) => setShowHidden(e.target.checked)}
+                  className="rounded border-slate-300 text-brand-primary focus:ring-brand-primary/20"
+                />
+                Show hidden devices
+              </label>
             </div>
 
             {selectedDevices.length > 0 && (
@@ -288,12 +350,19 @@ const AllDeviceList = () => {
                     <span className='font-medium text-slate-900 dark:text-white'>{device.brand}</span>
                   </TD>
                   <TD>
-                    <Badge 
-                      variant={device.status === 'Available' ? 'success' : 'warning'}
-                      size="sm"
-                    >
-                      {device.status}
-                    </Badge>
+                    <div className='flex items-center gap-2'>
+                      <Badge 
+                        variant={device.status === 'Available' ? 'success' : 'warning'}
+                        size="sm"
+                      >
+                        {device.status}
+                      </Badge>
+                      {device.webVisibility === false && (
+                        <Badge variant="danger" size="sm">
+                          Hidden
+                        </Badge>
+                      )}
+                    </div>
                   </TD>
                   <TD>
                     <div className='text-sm'>

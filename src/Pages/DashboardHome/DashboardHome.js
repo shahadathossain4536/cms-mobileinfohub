@@ -173,6 +173,11 @@ const DashboardHome = () => {
                     >
                       {device.status}
                     </Badge>
+                    {device.webVisibility === false && (
+                      <Badge variant="danger" size="sm">
+                        Hidden
+                      </Badge>
+                    )}
                     <span className='text-sm text-slate-500 dark:text-slate-400'>
                       {device.release_date}
                     </span>
