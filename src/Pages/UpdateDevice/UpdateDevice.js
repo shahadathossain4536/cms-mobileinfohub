@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import axios from "../../helpers/axios";
-import axiosLib from "axios";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import StepFormSection from "../../component/StepFormSection/StepFormSection";
@@ -68,16 +67,10 @@ const UpdateDevice = () => {
   const [photoGallery, setPhotoGallery] = useState([null]);
   const [startDate, setStartDate] = useState(null);
   const [expandableStorageOption, setExpandableStorageOption] = useState("no");
-  const [isImageSelected, setIsImageSelected] = useState(false);
-  const [deleteButtonVisible, setDeleteButtonVisible] = useState(false);
-  const [imageDeleteHash, setImageDeleteHash] = useState(null);
-  const [bannerImage, setBannerImage] = useState(null);
-  const [uploadedPhotoUrls, setUploadedPhotoUrls] = useState([]);
   const [expandableStorageType, setExpandableStorageType] = useState("");
   const [backCameraNumber, setBackCameraNumber] = useState();
   const [frontCameraNumber, setFrontCameraNumber] = useState();
   const [showFormSection, setShowFormSection] = useState(false);
-  const [isUploadSuccessful, setIsUploadSuccessful] = useState(false);
   const [isBannerDragActive, setIsBannerDragActive] = useState(false);
   const [galleryDragIndex, setGalleryDragIndex] = useState(null);
 
@@ -306,92 +299,10 @@ const UpdateDevice = () => {
     setGalleryDragIndex(null);
   };
 
-  const handleUploadButtonClick = async () => {
-    try {
-      if (selectedImage) {
-        const formData = new FormData();
-        formData.append("image", selectedImage);
-
-        const response = await axiosLib.post(
-          "https://api.imgbb.com/1/upload",
-          formData,
-          {
-            headers: {
-              "Content-Type": "multipart/form-data",
-            },
-            params: {
-              key: process.env.REACT_APP_IMGBB_KEY || "04ece4ca20ee040e0e21680d6591ddfe",
-            },
-          }
-        );
-
-        if (response.data.status === 200) {
-          const deleteHash = response.data.data.delete_url;
-          const bannerImageRes = response.data.data.display_url;
-
-          setDeleteButtonVisible(true);
-          setImageDeleteHash(deleteHash);
-          setBannerImage(bannerImageRes);
-          toast.success("Image uploaded successfully");
-          setIsUploadSuccessful(true);
-        } else {
-          toast.error("Failed to upload image");
-        }
-      } else {
-        toast.error("Please select an image to upload.", { duration: 4000 });
-      }
-    } catch (error) {
-      console.error("Error uploading image to ImgBB:", error);
-      toast.error("Error uploading image. Please try again later.", {
-        duration: 4000,
-      });
-    }
-  };
-
-  const handleDeleteButtonClick = async (deleteUrl) => {
-    // Image deletion logic can be implemented here
-  };
+  // ImgBB functionality removed - images now upload directly to server
 
   const handleAddPhotoInput = () => {
     setPhotoGallery((prevGallery) => [...prevGallery, null]);
-  };
-
-  const galleryPhotoUpload = async () => {
-    const apiKey = process.env.REACT_APP_IMGBB_KEY || "04ece4ca20ee040e0e21680d6591ddfe";
-    try {
-      const filesToUpload = photoGallery.filter((photo) => photo instanceof File);
-      if (filesToUpload.length === 0) {
-        toast("No new photos to upload", { icon: "ℹ️" });
-        return;
-      }
-
-      const uploadPromises = filesToUpload.map(async (photo) => {
-        const formData = new FormData();
-        formData.append("image", photo);
-
-        const response = await fetch(
-          "https://api.imgbb.com/1/upload?key=" + apiKey,
-          {
-            method: "POST",
-            body: formData,
-          }
-        );
-
-        const result = await response.json();
-
-        if (result.success) {
-          setUploadedPhotoUrls((prevUrls) => [...prevUrls, result.data.url]);
-        } else {
-          toast.error("Failed to upload photo");
-        }
-      });
-
-      await Promise.all(uploadPromises);
-      toast.success("All photos uploaded successfully");
-    } catch (error) {
-      console.error("Error uploading photos:", error);
-      toast.error("Error uploading photos");
-    }
   };
 
   const [inputData, setInputData] = useState({
@@ -572,20 +483,17 @@ const UpdateDevice = () => {
       }));
       formData.append('data', JSON.stringify(deviceData));
       
-      // Handle banner image
+      // Handle banner image - direct file upload
       if (selectedImage) {
-        // If new image selected, upload it
+        // New image selected, upload it
         formData.append('banner_img', selectedImage);
-      } else if (bannerImage) {
-        // If uploaded to ImgBB, send URL
-        formData.append('banner_img_url', bannerImage);
       } else if (imagePreviewUrl && !imagePreviewUrl.startsWith('data:')) {
-        // If existing URL (not base64), keep it
+        // Keep existing URL (not base64 preview)
         formData.append('banner_img_url', imagePreviewUrl);
       }
       
-      // Handle gallery photos
-      photoGallery.forEach((photo, index) => {
+      // Handle gallery photos - direct file upload
+      photoGallery.forEach((photo) => {
         if (photo instanceof File) {
           // New file to upload
           formData.append('galleryPhoto', photo);
@@ -594,13 +502,6 @@ const UpdateDevice = () => {
           formData.append('galleryPhoto_urls', photo);
         }
       });
-      
-      // Add uploaded photo URLs if any
-      if (uploadedPhotoUrls && uploadedPhotoUrls.length > 0) {
-        uploadedPhotoUrls.forEach(url => {
-          formData.append('galleryPhoto_urls', url);
-        });
-      }
 
       const response = await axios.put(
         `devicesData/${id}`,
@@ -1037,28 +938,10 @@ const UpdateDevice = () => {
                       src={imagePreviewUrl}
                       alt="Image Preview"
                     />
+                    <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">
+                      {selectedImage ? 'New image will be uploaded on submit' : 'Current banner image'}
+                    </p>
                   </div>
-                )}
-
-                {selectedImage && (
-                  <button
-                    type="button"
-                    onClick={handleUploadButtonClick}
-                    disabled={isUploadSuccessful}
-                    className="w-full h-12 bg-indigo-600 hover:bg-indigo-700 disabled:bg-slate-400 text-white rounded-lg font-medium transition-colors"
-                  >
-                    Upload Image
-                  </button>
-                )}
-
-                {deleteButtonVisible && (
-                  <button
-                    type="button"
-                    className="w-full h-12 bg-red-600 hover:bg-red-700 text-white rounded-lg font-medium transition-colors mt-2"
-                    onClick={() => handleDeleteButtonClick(imageDeleteHash)}
-                  >
-                    Delete Image
-                  </button>
                 )}
               </div>
             </div>
@@ -1377,17 +1260,11 @@ const UpdateDevice = () => {
               </button>
             </div>
 
-            {photoGallery.some((photo) => photo) && (
-              <div className="mt-6 text-center">
-                <button
-                  type="button"
-                  className="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-medium transition-colors"
-                  onClick={galleryPhotoUpload}
-                >
-                  Upload All Photos
-                </button>
-              </div>
-            )}
+            <div className="mt-4 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+              <p className="text-sm text-blue-800 dark:text-blue-200">
+                💡 Gallery photos will be uploaded directly to the server when you click "Update Device"
+              </p>
+            </div>
           </div>
 
           {/* Submit Button */}
