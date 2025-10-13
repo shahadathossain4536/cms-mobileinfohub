@@ -105,3 +105,39 @@ REACT_APP_API_BASE_URL=http://localhost:5000/api
   - `npm run build:prod`
 
 When neither `REACT_APP_API_BASE_URL` nor `REACT_APP_API_URL` is set, the app falls back to `https://deviceinfohub-server.vercel.app/api`.
+
+## 🚀 VPS Deployment
+
+This project is configured for automatic deployment to VPS when pushing to the `main` branch.
+
+### Quick Start Deployment
+
+1. **VPS Setup**: See [VPS_SETUP_COMMANDS.md](./VPS_SETUP_COMMANDS.md) for copy-paste commands
+2. **Quick Guide**: See [QUICK_DEPLOY.md](./QUICK_DEPLOY.md) for 5-step setup
+3. **Detailed Guide**: See [DEPLOYMENT_SETUP.md](./DEPLOYMENT_SETUP.md) for complete instructions
+
+### Deployment Files
+
+- `.github/workflows/deploy-vps.yml` - GitHub Actions workflow
+- `deploy.sh` - Deployment script
+- `nginx.conf.example` - Nginx configuration
+- `env.production.example` - Production environment template
+
+### Auto-Deployment
+
+After initial setup, deployment is automatic:
+
+```bash
+git add .
+git commit -m "Your changes"
+git push origin main
+```
+
+GitHub Actions will automatically deploy to your VPS!
+
+### Documentation
+
+- 📋 [VPS Setup Commands](./VPS_SETUP_COMMANDS.md) - Copy-paste commands for VPS
+- ⚡ [Quick Deploy Guide](./QUICK_DEPLOY.md) - Fast 5-step setup
+- 📖 [Complete Deployment Guide](./DEPLOYMENT_SETUP.md) - Detailed instructions
+- 📦 [Deployment Overview](./README_DEPLOYMENT.md) - Overview and reference

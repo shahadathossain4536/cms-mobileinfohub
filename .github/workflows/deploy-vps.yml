@@ -1,0 +1,46 @@
+name: Deploy CMS to VPS
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:  # Allow manual trigger
+
+jobs:
+  deploy:
+    name: Deploy to VPS
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+    
+    - name: Deploy to VPS via SSH
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.VPS_HOST }}
+        username: ${{ secrets.VPS_USERNAME }}
+        key: ${{ secrets.VPS_SSH_KEY }}
+        port: ${{ secrets.VPS_PORT || 22 }}
+        script: |
+          echo "🚀 Starting deployment for cms-mobileinfohub..."
+          
+          # Navigate to project directory
+          cd /var/www/cms-mobileinfohub
+          
+          # Run deployment script
+          bash deploy.sh
+          
+          echo "✅ Deployment completed!"
+    
+    - name: Deployment Status
+      if: success()
+      run: |
+        echo "✅ CMS deployed successfully to VPS!"
+        echo "Check your website at your configured domain."
+    
+    - name: Deployment Failed
+      if: failure()
+      run: |
+        echo "❌ Deployment failed! Check the logs above for details."
+        exit 1
+
