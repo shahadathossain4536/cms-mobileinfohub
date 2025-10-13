@@ -608,7 +608,7 @@ const UpdateDevice = () => {
         {
           headers: {
             Authorization: `Bearer ${token}`,
-            'Content-Type': 'multipart/form-data',
+            // Don't set Content-Type - axios will set it automatically with boundary
           },
         }
       );
