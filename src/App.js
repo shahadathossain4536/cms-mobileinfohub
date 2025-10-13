@@ -26,7 +26,7 @@ import AddDevicesTest from './Pages/AddDevicesTest/AddDevicesTest';
 import EditBrand from './Pages/EditBrand/EditBrand';
 
 function App() {
-  console.log('App component is rendering... test auto deploy 01');
+  console.log('App component is rendering... test auto deploy 02');
   
   return (
     <ErrorBoundary>
