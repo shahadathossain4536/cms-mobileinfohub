@@ -537,42 +537,78 @@ const UpdateDevice = () => {
   const onSubmit = async (data) => {
     try {
       setIsLoading(true);
-      const devicesData = {
-        brand: selectedOption,
-        deviceName: data.modelName || deviceDataOnly?.deviceName,
-        release_date: data.release_date || deviceDataOnly?.release_date,
-        banner_img: bannerImage || imagePreviewUrl,
-        galleryPhoto: uploadedPhotoUrls || photoGallery,
-        weight: data.weight || deviceDataOnly?.weight,
-        backCamera: data.backCamera || deviceDataOnly?.backCamera,
-        backCameraVideo: data.backCameraVideo || deviceDataOnly?.backCameraVideo,
-        battery: data.battery || deviceDataOnly?.battery,
-        chargingSpeed: data.chargingSpeed || deviceDataOnly?.chargingSpeed,
-        processor: data.processor || deviceDataOnly?.processor,
-        thickness: data.thickness || deviceDataOnly?.thickness,
-        os_android: data.os_android || deviceDataOnly?.os_android,
-        os_brand: data.os_brand || deviceDataOnly?.os_brand,
-        displaySize: data.displaySize || deviceDataOnly?.displaySize,
-        displayResolution: data.displayResolution || deviceDataOnly?.displayResolution,
-        expandable_storage: expandableStorageOption,
-        expandable_storage_type: data.expandable_storage_type || deviceDataOnly?.expandable_storage_type,
-        ram: data.ram || deviceDataOnly?.ram,
-        storage: data.storage || deviceDataOnly?.storage,
-        webVisibility: webVisibility,
-        storageVariants: storageVariants,
-        data: Object.entries(inputData).map(([type, subType]) => ({
-          type,
-          subType,
-        })),
-      };
+      
+      // Create FormData for multipart/form-data upload
+      const formData = new FormData();
+      
+      // Add text fields
+      formData.append('brand', selectedOption);
+      formData.append('deviceName', data.modelName || deviceDataOnly?.deviceName);
+      formData.append('release_date', data.release_date || deviceDataOnly?.release_date);
+      formData.append('weight', data.weight || deviceDataOnly?.weight || '');
+      formData.append('backCamera', data.backCamera || deviceDataOnly?.backCamera || '');
+      formData.append('backCameraVideo', data.backCameraVideo || deviceDataOnly?.backCameraVideo || '');
+      formData.append('battery', data.battery || deviceDataOnly?.battery || '');
+      formData.append('chargingSpeed', data.chargingSpeed || deviceDataOnly?.chargingSpeed || '');
+      formData.append('processor', data.processor || deviceDataOnly?.processor || '');
+      formData.append('thickness', data.thickness || deviceDataOnly?.thickness || '');
+      formData.append('os_android', data.os_android || deviceDataOnly?.os_android || '');
+      formData.append('os_brand', data.os_brand || deviceDataOnly?.os_brand || '');
+      formData.append('displaySize', data.displaySize || deviceDataOnly?.displaySize || '');
+      formData.append('displayResolution', data.displayResolution || deviceDataOnly?.displayResolution || '');
+      formData.append('expandable_storage', expandableStorageOption);
+      formData.append('expandable_storage_type', data.expandable_storage_type || deviceDataOnly?.expandable_storage_type || '');
+      formData.append('ram', data.ram || deviceDataOnly?.ram || '');
+      formData.append('storage', data.storage || deviceDataOnly?.storage || '');
+      formData.append('webVisibility', webVisibility);
+      
+      // Add storage variants as JSON string
+      formData.append('storageVariants', JSON.stringify(storageVariants));
+      
+      // Add device data as JSON string
+      const deviceData = Object.entries(inputData).map(([type, subType]) => ({
+        type,
+        subType,
+      }));
+      formData.append('data', JSON.stringify(deviceData));
+      
+      // Handle banner image
+      if (selectedImage) {
+        // If new image selected, upload it
+        formData.append('banner_img', selectedImage);
+      } else if (bannerImage) {
+        // If uploaded to ImgBB, send URL
+        formData.append('banner_img_url', bannerImage);
+      } else if (imagePreviewUrl && !imagePreviewUrl.startsWith('data:')) {
+        // If existing URL (not base64), keep it
+        formData.append('banner_img_url', imagePreviewUrl);
+      }
+      
+      // Handle gallery photos
+      photoGallery.forEach((photo, index) => {
+        if (photo instanceof File) {
+          // New file to upload
+          formData.append('galleryPhoto', photo);
+        } else if (typeof photo === 'string' && !photo.startsWith('data:')) {
+          // Existing URL (not base64)
+          formData.append('galleryPhoto_urls', photo);
+        }
+      });
+      
+      // Add uploaded photo URLs if any
+      if (uploadedPhotoUrls && uploadedPhotoUrls.length > 0) {
+        uploadedPhotoUrls.forEach(url => {
+          formData.append('galleryPhoto_urls', url);
+        });
+      }
 
       const response = await axios.put(
         `devicesData/${id}`,
-        devicesData,
+        formData,
         {
           headers: {
             Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json',
+            'Content-Type': 'multipart/form-data',
           },
         }
       );
