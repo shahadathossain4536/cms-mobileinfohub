@@ -328,7 +328,7 @@ const AddDevices = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get("brandName");
+        const response = await axios.get("brandName?limit=100");
 
         const formattedData = response.data.brandNames.map((brand) => ({
           label: brand.name,
