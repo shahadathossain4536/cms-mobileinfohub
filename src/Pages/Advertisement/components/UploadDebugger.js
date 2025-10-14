@@ -91,7 +91,7 @@ const UploadDebugger = () => {
       <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
         <h5 className="font-medium text-blue-900 mb-2">Backend Status Check</h5>
         <div className="text-sm text-blue-700">
-          <p>Expected API URL: {process.env.NODE_ENV === 'development' ? 'http://localhost:2000/api' : 'https://deviceinfohub-server.vercel.app/api'}</p>
+          <p>Expected API URL: {process.env.NODE_ENV === 'development' ? 'http://localhost:2000/api' : 'https://api.mobileinfohub.com/api'}</p>
           <p>Current Environment: {process.env.NODE_ENV}</p>
         </div>
       </div>

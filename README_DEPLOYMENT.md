@@ -199,7 +199,7 @@ NODE_ENV=development
 
 ### Production (.env.production)
 ```env
-REACT_APP_API_BASE_URL=https://deviceinfohub-server.vercel.app/api
+REACT_APP_API_BASE_URL=https://api.mobileinfohub.com/api
 PORT=3322
 NODE_ENV=production
 ```

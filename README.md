@@ -104,7 +104,7 @@ REACT_APP_API_BASE_URL=http://localhost:5000/api
 - Production build with `.env.production`:
   - `npm run build:prod`
 
-When neither `REACT_APP_API_BASE_URL` nor `REACT_APP_API_URL` is set, the app falls back to `https://deviceinfohub-server.vercel.app/api`.
+When neither `REACT_APP_API_BASE_URL` nor `REACT_APP_API_URL` is set, the app falls back to `https://api.mobileinfohub.com/api`.
 
 ## 🚀 VPS Deployment
 

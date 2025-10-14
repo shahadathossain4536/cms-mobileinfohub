@@ -303,7 +303,7 @@ git push origin main
 
 - **GitHub Repo:** https://github.com/shahadathossain4536/cms-mobileinfohub
 - **GitHub Actions:** https://github.com/shahadathossain4536/cms-mobileinfohub/actions
-- **Current API:** https://deviceinfohub-server.vercel.app/api
+- **Current API:** https://api.mobileinfohub.com/api
 
 ---
 

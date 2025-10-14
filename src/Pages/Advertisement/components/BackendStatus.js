@@ -13,7 +13,7 @@ const BackendStatus = ({ onBackendAvailable }) => {
     setIsChecking(true);
     
     const localUrl = 'http://localhost:2000/api';
-    const productionUrl = 'https://deviceinfohub-server.vercel.app/api';
+    const productionUrl = 'https://api.mobileinfohub.com/api';
     
     // Try local first in development
     const urlToCheck = process.env.NODE_ENV === 'development' ? localUrl : productionUrl;

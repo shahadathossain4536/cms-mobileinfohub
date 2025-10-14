@@ -19,7 +19,7 @@ const AdminAdvertisements = () => {
   const getApiUrl = () => {
     return process.env.NODE_ENV === 'development' 
       ? 'http://localhost:2000/api' 
-      : 'https://deviceinfohub-server.vercel.app/api';
+      : 'https://api.mobileinfohub.com/api';
   };
 
   // Get full image URL
@@ -29,7 +29,7 @@ const AdminAdvertisements = () => {
     
     const apiUrl = process.env.NODE_ENV === 'development' 
       ? 'http://localhost:2000' 
-      : 'https://deviceinfohub-server.vercel.app';
+      : 'https://api.mobileinfohub.com';
     
     return `${apiUrl}${url}`;
   };

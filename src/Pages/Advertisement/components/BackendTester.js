@@ -20,7 +20,7 @@ const BackendTester = () => {
 
     const apiUrl = process.env.NODE_ENV === 'development' 
       ? 'http://localhost:2000/api' 
-      : 'https://deviceinfohub-server.vercel.app/api';
+      : 'https://api.mobileinfohub.com/api';
 
     // Test 1: Basic connectivity
     try {
@@ -127,7 +127,7 @@ const BackendTester = () => {
         <h4 className="font-medium text-blue-900 mb-1">Test Information</h4>
         <div className="text-sm text-blue-700">
           <p><strong>Environment:</strong> {process.env.NODE_ENV}</p>
-          <p><strong>API URL:</strong> {process.env.NODE_ENV === 'development' ? 'http://localhost:2000/api' : 'https://deviceinfohub-server.vercel.app/api'}</p>
+          <p><strong>API URL:</strong> {process.env.NODE_ENV === 'development' ? 'http://localhost:2000/api' : 'https://api.mobileinfohub.com/api'}</p>
           <p><strong>Frontend URL:</strong> {window.location.origin}</p>
         </div>
       </div>

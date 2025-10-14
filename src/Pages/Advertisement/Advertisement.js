@@ -21,7 +21,7 @@ const Advertisement = () => {
     try {
       const apiUrl = process.env.NODE_ENV === 'development' 
         ? 'http://localhost:2000/api' 
-        : 'https://deviceinfohub-server.vercel.app/api';
+        : 'https://api.mobileinfohub.com/api';
       
       const response = await fetch(`${apiUrl}/advertisements/public/running-count`);
       const data = await response.json();

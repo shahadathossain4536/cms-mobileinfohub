@@ -181,7 +181,7 @@ nano .env.production
 
 **Configure your API URL:**
 ```env
-REACT_APP_API_BASE_URL=https://deviceinfohub-server.vercel.app/api
+REACT_APP_API_BASE_URL=https://api.mobileinfohub.com/api
 NODE_ENV=production
 ```
 

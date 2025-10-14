@@ -6,7 +6,7 @@ export const API_CONFIG = {
   LOCAL_API_URL: 'http://localhost:2000/api',
   
   // Production server
-  PRODUCTION_API_URL: 'https://deviceinfohub-server.vercel.app/api',
+  PRODUCTION_API_URL: 'https://api.mobileinfohub.com/api',
   
   // Get current API URL
   getCurrentApiUrl: () => {

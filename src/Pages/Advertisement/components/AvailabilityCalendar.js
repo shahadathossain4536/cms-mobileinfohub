@@ -11,7 +11,7 @@ const AvailabilityCalendar = ({ placement, onDateSelect, selectedDate }) => {
   const getApiUrl = () => {
     return process.env.NODE_ENV === 'development' 
       ? 'http://localhost:2000/api' 
-      : 'https://deviceinfohub-server.vercel.app/api';
+      : 'https://api.mobileinfohub.com/api';
   };
 
   useEffect(() => {

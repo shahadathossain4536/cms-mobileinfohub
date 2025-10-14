@@ -4,7 +4,7 @@ import axios from '../../../helpers/axios';
 // Development configuration
 const isDevelopment = process.env.NODE_ENV === 'development';
 const LOCAL_API_URL = 'http://localhost:2000/api';
-const PRODUCTION_API_URL = 'https://deviceinfohub-server.vercel.app/api';
+const PRODUCTION_API_URL = 'https://api.mobileinfohub.com/api';
 
 // Get the correct API URL based on environment
 const getApiUrl = () => {
