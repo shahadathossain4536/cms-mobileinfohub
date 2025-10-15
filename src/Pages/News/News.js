@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "../../helpers/axios";
 import toast from "react-hot-toast";
 import { useForm } from "react-hook-form";
+import NewsForm from "../../component/NewsForm/NewsForm";
 
 const News = () => {
   const [news, setNews] = useState([]);
@@ -14,10 +15,12 @@ const News = () => {
   const [editingNews, setEditingNews] = useState(null);
   const [selectedNews, setSelectedNews] = useState([]);
   const [isSelectAll, setIsSelectAll] = useState(false);
+  const [showForm, setShowForm] = useState(false);
   const [filters, setFilters] = useState({
     status: "",
     category: "",
-    author: ""
+    author: "",
+    search: ""
   });
 
   const token = window.localStorage.getItem("token");

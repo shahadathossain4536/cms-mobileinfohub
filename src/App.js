@@ -14,7 +14,8 @@ import Advertisement from './Pages/Advertisement/Advertisement';
 import MyAdvertisements from './Pages/Advertisement/MyAdvertisements';
 import AdminAdvertisements from './Pages/Advertisement/AdminAdvertisements';
 import Devices from './Pages/Devices/Devices';
-import News from './Pages/News/News';
+import EnhancedNews from './Pages/News/EnhancedNews';
+import NewsCategories from './Pages/NewsCategories/NewsCategories';
 import Blog from './Pages/Blog/Blog';
 import MyCreations from './Pages/MyCreations/MyCreations';
 import NotFound from './Pages/NotFound';
@@ -53,7 +54,8 @@ function App() {
             <Route path="advertisement" element={<Advertisement />} />
             <Route path="my-advertisements" element={<MyAdvertisements />} />
             <Route path="admin-advertisements" element={<AdminAdvertisements />} />
-            <Route path="news" element={<News />} />
+            <Route path="news" element={<EnhancedNews />} />
+            <Route path="news-categories" element={<NewsCategories />} />
             <Route path="blog" element={<Blog />} />
             <Route path="my-creations" element={<MyCreations />} />
             <Route path="add-devices-test" element={<AddDevicesTest />} />
