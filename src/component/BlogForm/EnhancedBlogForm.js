@@ -70,13 +70,21 @@ const EnhancedBlogForm = ({ blog, onSuccess, onCancel }) => {
   }, []);
 
   const onSubmit = async (data) => {
+    console.log('=== Form Submission Debug ===');
+    console.log('Banner Image State:', bannerImage);
+    console.log('Gallery Images State:', galleryImages);
+    console.log('Content:', content.substring(0, 100));
+    
     if (!content.trim()) {
       toast.error('Content is required');
       return;
     }
 
     if (bannerImage.length === 0 && !blog?.bannerImage) {
-      toast.error('Banner image is required');
+      console.error('❌ Banner image validation failed');
+      console.log('bannerImage.length:', bannerImage.length);
+      console.log('blog?.bannerImage:', blog?.bannerImage);
+      toast.error('Banner image is required. Please upload a banner image.');
       return;
     }
 
@@ -104,8 +112,11 @@ const EnhancedBlogForm = ({ blog, onSuccess, onCancel }) => {
       formData.append('sliderShowArrows', sliderConfig.showArrows);
 
       // Add banner image
-      if (bannerImage.length > 0) {
+      if (bannerImage.length > 0 && bannerImage[0].file) {
+        console.log('✅ Adding banner image to FormData:', bannerImage[0].file.name);
         formData.append('bannerImage', bannerImage[0].file);
+      } else {
+        console.warn('⚠️ No banner image file found');
       }
 
       // Add gallery images
