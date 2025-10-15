@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "../../helpers/axios";
 import toast from "react-hot-toast";
 import { useForm } from "react-hook-form";
+import EnhancedBlogForm from "../../component/BlogForm/EnhancedBlogForm";
 
 const Blog = () => {
   const [blogs, setBlogs] = useState([]);
@@ -12,6 +13,7 @@ const Blog = () => {
   const [itemsPerPage] = useState(10);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingBlog, setEditingBlog] = useState(null);
+  const [showForm, setShowForm] = useState(false);
   const [selectedBlogs, setSelectedBlogs] = useState([]);
   const [isSelectAll, setIsSelectAll] = useState(false);
   const [filters, setFilters] = useState({
@@ -107,6 +109,31 @@ const Blog = () => {
     setValue("tags", blogItem.tags?.join(", "));
     setValue("status", blogItem.status);
     setIsModalOpen(true);
+  };
+
+  // Open enhanced form for editing
+  const openEditForm = (blog) => {
+    setEditingBlog(blog);
+    setShowForm(true);
+  };
+
+  // Open enhanced form for creating
+  const openCreateForm = () => {
+    setEditingBlog(null);
+    setShowForm(true);
+  };
+
+  // Handle form success
+  const handleFormSuccess = (data) => {
+    setShowForm(false);
+    setEditingBlog(null);
+    fetchBlogs(currentPage);
+  };
+
+  // Handle form cancel
+  const handleFormCancel = () => {
+    setShowForm(false);
+    setEditingBlog(null);
   };
 
   // Close modal
@@ -235,6 +262,19 @@ const Blog = () => {
     }
   }, [selectedBlogs, blogs]);
 
+  // Show enhanced form if needed
+  if (showForm) {
+    return (
+      <div className="min-h-screen bg-gray-50 py-8">
+        <EnhancedBlogForm
+          blog={editingBlog}
+          onSuccess={handleFormSuccess}
+          onCancel={handleFormCancel}
+        />
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 p-6">
       <div className="max-w-7xl mx-auto">
@@ -250,7 +290,7 @@ const Blog = () => {
           </div>
           <div className="flex gap-3">
             <button
-              onClick={openAddModal}
+              onClick={openCreateForm}
               className="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-medium transition-colors"
             >
               + Add Blog
@@ -395,7 +435,7 @@ const Blog = () => {
                           <td className="px-6 py-4">
                             <div className="flex gap-2">
                               <button
-                                onClick={() => openEditModal(item)}
+                                onClick={() => openEditForm(item)}
                                 className="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white text-xs rounded transition-colors"
                               >
                                 Edit

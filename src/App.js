@@ -17,6 +17,7 @@ import Devices from './Pages/Devices/Devices';
 import EnhancedNews from './Pages/News/EnhancedNews';
 import NewsCategories from './Pages/NewsCategories/NewsCategories';
 import Blog from './Pages/Blog/Blog';
+import BlogCategories from './Pages/BlogCategories/BlogCategories';
 import MyCreations from './Pages/MyCreations/MyCreations';
 import NotFound from './Pages/NotFound';
 import ErrorBoundary from './component/ui/ErrorBoundary';
@@ -57,6 +58,7 @@ function App() {
             <Route path="news" element={<EnhancedNews />} />
             <Route path="news-categories" element={<NewsCategories />} />
             <Route path="blog" element={<Blog />} />
+            <Route path="blog-categories" element={<BlogCategories />} />
             <Route path="my-creations" element={<MyCreations />} />
             <Route path="add-devices-test" element={<AddDevicesTest />} />
           </Route>
