@@ -281,7 +281,7 @@ const EnhancedNews = () => {
             <p className="text-gray-600">No news found</p>
           </div>
         ) : (
-          <div className="divide-y divide-gray-200">
+          <div className="divide-y divide-gray-200 grid grid-cols-3 gap-5">
             {news.map((item) => (
               <div key={item._id} className="p-6 hover:bg-gray-50">
                 <div className="flex items-start gap-4">
